@@ -13,21 +13,16 @@ needs:
 1. Copy the `floatingporousFoam` floder to `$WM_PROJECT_USER_DIR`.
 2. Run `./Allwmake`.
 3. Include the following lines in your `contorlDict` and `dynamicmeshDict` file:
+   
    `libs
-   
-   (
-   
-     poroussixDoFRigidBodyMotion
-   
-   );`
+      (
+        poroussixDoFRigidBodyMotion
+      );`
    
    `motionSolverLibs
-   
-   (
-   
-     poroussixDoFRigidBodyMotion
-   
-   );`
+      (
+        poroussixDoFRigidBodyMotion
+      );`
 
 
 ## Publications
