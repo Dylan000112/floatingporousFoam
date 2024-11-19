@@ -26,8 +26,8 @@ For the moored-floating porous sturcture case, requires `foamMooring`: https://g
 Yiyong Dong, Weikai Tan, Hao Chen, Jing Yuan; Numerical modeling of wave interaction with a porous floating structure consisting of uniform spheres. Physics of Fluids 1 August 2024; 36 (8): 087133. https://doi.org/10.1063/5.0222161
 
 ## Acknowledgements
-**OpenFOAM** is free, open source software for computational fluid dynamics (CFD), developed primarily by CFD Direct, on behalf of the OpenFOAM Foundation. (https://openfoam.org/)
+**OpenFOAM** is free, open source software for computational fluid dynamics (CFD), developed primarily by CFD Direct, on behalf of the [OpenFOAM](https://openfoam.org/) Foundation. 
 
-**olaFlow** is an open source project developed within the OpenFOAM® framework as a continuation of the work in Higuera et al. for simulating wave and porous structure interactions in the coastal and offshore fields. (https://github.com/phicau/olaFlow)
+**olaFlow** is an open source project developed within the OpenFOAM® framework as a continuation of the work in [Higuera et al.](https://github.com/phicau/olaFlow) for simulating wave and porous structure interactions in the coastal and offshore fields. 
 
-**foamMooring** is a mooring restraints library for rigid body motions in OpenFOAM®, developed by Haifei Chen. (https://gitlab.com/hfchen20/foamMooring/-/tree/master/).
+**foamMooring** is a mooring restraints library for rigid body motions in OpenFOAM®, developed by [Haifei Chen](https://gitlab.com/hfchen20/foamMooring/-/tree/master/).
