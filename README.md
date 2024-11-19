@@ -1,4 +1,5 @@
 # porousFoam
+![Image loading](./doc/video.avi)
 **porousFoam** is a library for simulating porous structure's motion under wave and current in OpenFOAM
 
 ## Usage
