@@ -120,30 +120,27 @@ sixDoFRigidBodyMotionCoeffs
 	// Example mooring restraints as defined in libsixDoFMooring
 	//    map3R || moodyR || moorDynR1
 
-		moodyR
-		{
-			sixDoFRigidBodyMotionRestraint moodyR; // map3R, moodyR, moorDynR1
+	/*
+	moodyR
+	{
+		sixDoFRigidBodyMotionRestraint moodyR; // map3R, moodyR, moorDynR1
+		inputFile              "Mooring/boxWu_exPoint.m";
+		couplingMode           "externalPoint";  // "externalPoint" or "externalRigidBody"
 
-			inputFile              "Mooring/boxWu_exPoint.m";
-            couplingMode           "externalPoint";  // "externalPoint" or "externalRigidBody"
-
-            //If couplingMode is "externalPoint", nCouplingDof = 3*refAttachmentPt.size()
-            nCouplingDof           9;
-            refAttachmentPt
-            (
-                (-0.25      0.4      0.43)
-                (-0.25     -0.4      0.43)
-                (  0.25      0.4      0.43)
-                ( 0.25     -0.4      0.43)
-            );
-            waveKinematics         false;
-            twoD                   false;//true;        
+		//If couplingMode is "externalPoint", nCouplingDof = 3*refAttachmentPt.size()
+		nCouplingDof           9;
+		refAttachmentPt
+		(
+                	(-0.25      0.4      0.43)
+                	(-0.25     -0.4      0.43)
+                	( 0.25      0.4      0.43)
+                	( 0.25     -0.4      0.43)
+		);
+		waveKinematics         false;
+		twoD                   false;//true;        
             
-		}
-
-
-        
-
+	}  
+	*/
 
     }
 
