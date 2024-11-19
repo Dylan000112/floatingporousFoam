@@ -4,8 +4,10 @@
 
 ## Usage
 Case have been tested for OpenFOAM v2206 only.
-Requires `olaFlow`: https://github.com/phicau/olaFlow
-For the moored-floating porous sturctures, requires `foamMooring`: https://gitlab.com/hfchen20/foamMooring/-/tree/master/
+
+Requires `olaFlow`: https://github.com/phicau/olaFlow.
+
+For the moored-floating porous sturctures, requires `foamMooring`: https://gitlab.com/hfchen20/foamMooring/-/tree/master/.
 
 ## Installation
 1. Copy the `floatingporousFoam` floder to `$WM_PROJECT_USER_DIR`.
