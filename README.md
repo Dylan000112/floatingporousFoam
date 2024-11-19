@@ -3,7 +3,7 @@
 **FloatingporousFoam** is a library for simulating porous structure's motion under wave and current in OpenFOAM.
 
 ## Usage
-Case have been tested for OpenFOAM v2206 only.
+Cases have been tested for OpenFOAM v2206 only.
 
 Requires `olaFlow`: https://github.com/phicau/olaFlow.
 
