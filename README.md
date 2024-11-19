@@ -14,12 +14,19 @@ needs:
 2. Run `./Allwmake`.
 3. Include the following lines in your `contorlDict` and `dynamicmeshDict` file:
    `libs
+   
    (
+   
      poroussixDoFRigidBodyMotion
+   
    );`
+   
    `motionSolverLibs
+   
    (
+   
      poroussixDoFRigidBodyMotion
+   
    );`
 
 
