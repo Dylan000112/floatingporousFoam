@@ -1,0 +1,10 @@
+#!/bin/bash
+
+echo "Clean porousforce..."
+(cd porousforce && wclean)
+
+echo "Clean porousolaFlow..."
+(cd porousolaFlow && wclean)
+
+echo "Clean porousolaFlow..."
+(cd poroussixDoFRigidBodyMotion && wclean)

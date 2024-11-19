@@ -1,0 +1,10 @@
+#!/bin/bash
+
+echo "Compling porousforce..."
+(cd porousforce && wmake libso)
+
+echo "Compling porousolaFlow..."
+(cd porousolaFlow && ./allMake)
+
+echo "Compling porousolaFlow..."
+(cd poroussixDoFRigidBodyMotion && wmake libso)
