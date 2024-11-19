@@ -1,5 +1,7 @@
 #!/bin/bash
 
+cd src
+
 echo "Compling porousforce..."
 (cd porousforce && wmake libso)
 
