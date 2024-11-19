@@ -1,7 +1,7 @@
 # FloatingporousFoam
 [![Image loading](./doc/pic.png)](https://www.youtube.com/watch?v=D-EE6wJXsYc)
 
-**FloatingporousFoam** is a library for simulating porous structure's motion under wave and current in OpenFOAM.
+[**FloatingporousFoam**](https://www.youtube.com/watch?v=D-EE6wJXsYc) is a library for simulating porous structure's motion under wave and current in OpenFOAM.
 
 ## Usage
 Cases have been tested for OpenFOAM v2206 only.
