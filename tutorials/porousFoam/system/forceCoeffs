@@ -1,0 +1,66 @@
+porousforces
+{
+    type                porousforces;
+    //functionObjectLibs  
+    libs ("libporousforce.so");
+    //outputControl       timeStep;
+    //outputInterval      1;
+     
+    patches             ("porous" );
+    //regionType  cellZone;
+    //name        porous;
+    
+    pName               p;
+    Uname               U;
+    rho             rhoInf;
+    log                 true;
+     
+    CofR                (-0.2 0 0.95);
+     
+    rhoInf              1000;
+	porosity true;
+}
+ 
+/* 
+porousforceCoeffs
+{
+    type                porousforceCoeffs;
+    //functionObjectLibs
+    libs  ( "libmyfunctionObject3.so" );
+    //outputControl       timeStep;
+    //outputInterval      1;
+ 
+    patches             ("porous"  );
+    //regionType  cellZone;
+    //name        porous;
+    
+    pName               p;
+    Uname              U;
+    rho             rhoInf;
+    log                 true;
+     
+    liftDir             (0 0 1);
+    dragDir             (1 0 0);
+    CofR                (-3 0 0.95);
+    pitchAxis           (0 1 0);
+    
+    magUInf             20;
+    rhoInf              1000;
+    lRef                1.5;
+    Aref                0.9;
+	
+	porosity true;
+}
+
+*/
+
+
+
+//Cm  moment coefficient
+//Cd  drag coefficient
+//Cl  lift coefficient
+//cl(f)  front lift coefficient
+//cl(r)  rear lift coefficient
+
+
+

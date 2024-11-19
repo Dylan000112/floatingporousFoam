@@ -1,0 +1,153 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  5                                     |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      motionProperties;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+motionSolverLibs
+(
+	poroussixDoFRigidBodyMotion
+	//"/home/dongyy/OpenFOAM/dongyy-v2206/platforms/linux64GccDPInt32Opt/lib/libporoussixDoFRigidBodyMotion.so"
+);
+
+dynamicFvMesh       dynamicMotionSolverFvMesh;
+
+motionSolver        sixDoFRigidBodyMotion;
+
+
+sixDoFRigidBodyMotionCoeffs
+{
+   
+    innerDistance   1.732;
+    outerDistance   5;
+       
+    //Rigidbody
+        patches         (floatingObject);
+    	centreOfMass    (0 0 0.54);
+    	rhoSolid        500;
+    	//dimensions
+    	Rx              0;
+    	Ry              0;
+    	Rz              0;        
+    	Rigidmass       #calc "$rhoSolid*$Rx*$Ry*$Rz";
+
+    //Porous
+        poropatches     ("porous");
+    	porosity        0.45;
+    	rhoPoro         680;
+    	//dimensions
+    	Px              0.5;
+    	Py              0.8;
+    	Pz              0.22;        
+    	Poromass        #calc "$rhoPoro*$Px*$Py*$Pz*(1-$porosity)";
+
+    //total       
+        mass  #calc "$Rigidmass+$Poromass";
+        
+    //centerOfRotation
+        M_poro          #calc "$Px*(1-$porosity)*$rhoPoro*$Px*0.5";
+        M_Rigid         #calc "$Rx*$rhoSolid*($Px+$Rx*0.5)";
+        Ro_x1           #calc "($M_poro+$M_Rigid)/($Px*(1-$porosity)*$rhoPoro + $Rx*$rhoSolid)";
+        Ro_x2           #calc "($Ro_x1-$Px)-$Rx*0.5";            
+        centreOfRotation  (0  0  0.54);  
+
+    //momentOfInertia
+	momentOfInertia #codeStream
+	{
+		codeInclude
+		#{
+    	        #include "diagTensor.H"
+		#};
+
+		code
+		#{
+			scalar sqrLx = sqr($Rx+$Px);
+			scalar sqrLy = sqr($Ry+$Py);
+			scalar sqrLz = sqr($Rz+$Pz);
+			os  <<
+             	    $mass
+             	   *diagTensor(sqrLy + sqrLz, sqrLx + sqrLz, sqrLx + sqrLy)/12.0;
+		#};
+	};
+
+
+    report          on;
+    accelerationRelaxation 0.7;
+    //accelerationDamping 0;
+
+    solver
+    {
+        type Newmark;
+    }
+
+    constraints
+    {
+    	/*
+        fixedPoint
+        {
+             sixDoFRigidBodyMotionConstraint point;
+             centreOfRotation (0.5 0.45 0.1);
+        }
+
+        fixedLine
+        {
+            sixDoFRigidBodyMotionConstraint line;
+            centreOfRotation (0 0 0.95);
+            direction (0 1 0);
+        }
+	   
+        fixedAxis
+        {
+            sixDoFRigidBodyMotionConstraint axis;
+            axis (0 1 0);
+        }
+        */ 
+    }
+    
+    
+    restraints
+    {
+	// Example mooring restraints as defined in libsixDoFMooring
+	//    map3R || moodyR || moorDynR1
+
+		moodyR
+		{
+			sixDoFRigidBodyMotionRestraint moodyR; // map3R, moodyR, moorDynR1
+
+			inputFile              "Mooring/boxWu_exPoint.m";
+            couplingMode           "externalPoint";  // "externalPoint" or "externalRigidBody"
+
+            //If couplingMode is "externalPoint", nCouplingDof = 3*refAttachmentPt.size()
+            nCouplingDof           9;
+            refAttachmentPt
+            (
+                (-0.25      0.4      0.43)
+                (-0.25     -0.4      0.43)
+                (  0.25      0.4      0.43)
+                ( 0.25     -0.4      0.43)
+            );
+            waveKinematics         false;
+            twoD                   false;//true;        
+            
+		}
+
+
+        
+
+
+    }
+
+}
+
+
+// ************************************************************************* //
