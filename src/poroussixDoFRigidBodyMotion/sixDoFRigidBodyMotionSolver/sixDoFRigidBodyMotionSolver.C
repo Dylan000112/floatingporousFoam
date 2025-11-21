@@ -91,6 +91,7 @@ Foam::sixDoFRigidBodyMotionSolver::sixDoFRigidBodyMotionSolver
     patchSet_(mesh.boundaryMesh().patchSet(patches_)),
     di_(coeffDict().get<scalar>("innerDistance")),
     do_(coeffDict().get<scalar>("outerDistance")),
+    cramp_(coeffDict().get<scalar>("cramp")),
     test_(coeffDict().getOrDefault("test", false)),
     rhoInf_(1.0),
     rhoName_(coeffDict().getOrDefault<word>("rho", "rho")),
@@ -268,11 +269,19 @@ void Foam::sixDoFRigidBodyMotionSolver::solve()
         Info<< "Total porous force = " << f.forceEff() << nl << endl;
         Info<< "Total porous moment = " << f.momentEff() << nl << endl; 
 
+
+        Info<< "PFB velocity = " << motion_.v() << nl << endl; 
+        Info<< "cramp = " << cramp_ << nl << endl; 	
+        	
+        	
+        Info<< "cramp*motion_.v() = " << cramp_*motion_.v() << nl << endl; 
+        Info<< "f.forceEff() + cramp_*motion_.v() = " << f.forceEff() + cramp_*motion_.v() << nl << endl; 
+        
         	
         motion_.update
         (
             firstIter, 
-            ramp*(f.forceEff() + motion_.Rigidmass()*g.value()),           
+            ramp*(f.forceEff() - cramp_*motion_.v() + motion_.Rigidmass()*g.value()),           
             
             ramp
            *(
