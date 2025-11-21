@@ -1,0 +1,136 @@
+#!/bin/bash
+
+# 参数
+N_PADDLES=25
+T_SMOOTH=3
+WAVE_TYPE="Irregular"
+GEN_ABS=1
+ABS_DIR=0.0
+
+HS=0.15
+TP=1.2
+GAMMA=3.3
+NUM_COMPONENTS=500
+MIN_FREQ=0.2
+MAX_FREQ=3.0
+SPREAD=30.0
+
+
+# 调用 Python 脚本生成数据 & 验证信息
+json=$(python3 - <<EOF
+import json, math, random, numpy as np
+import matplotlib
+matplotlib.use('Agg')           # 无显示环境下使用
+import matplotlib.pyplot as plt
+
+Hs=float("${HS}")
+Tp=float("${TP}")
+gamma=float("${GAMMA}")
+num_components=int("${NUM_COMPONENTS}")
+min_freq=float("${MIN_FREQ}")
+max_freq=float("${MAX_FREQ}")
+spread=float("${SPREAD}")
+
+g=9.81
+freqs=np.linspace(min_freq, max_freq, num_components)
+delta_f=freqs[1]-freqs[0]
+
+def jonswap_spectrum(freqs, Hs, Tp, gamma):
+    sigma=np.where(freqs<=1/Tp,0.07,0.09)
+    alpha=0.0081
+    A=np.exp(-1.25*(freqs/(1/Tp))**(-4))
+    B=gamma**np.exp(-0.5*((freqs-1/Tp)/(sigma*1/Tp))**2)
+    S=alpha*g**2*(2*math.pi)**(-4)*freqs**(-5)*A*B
+    m0_target=Hs**2/16
+    m0_current=np.trapz(S,freqs)
+    if m0_current>0:
+        S*=m0_target/m0_current
+    return S
+
+S=jonswap_spectrum(freqs,Hs,Tp,gamma)
+computed_Hs=4*np.sqrt(np.trapz(S,freqs))
+actual_Tp=1/freqs[np.argmax(S)]
+
+wave_heights=2*np.sqrt(2*S*delta_f)
+phases=[random.uniform(0,2*math.pi) for _ in range(num_components)]
+dirs=[0.0+spread*random.uniform(-1,1) for _ in range(num_components)]
+
+# =============== 画图 JONSWAP谱 =====================
+plt.figure(figsize=(8,5))
+plt.plot(freqs, S, 'b-', lw=2)
+plt.xlabel('Frequency (Hz)')
+plt.ylabel('Spectral Density S(f)')
+plt.title('JONSWAP Spectrum')
+plt.grid(True)
+
+# 在图上标注Hs和Tp
+plt.annotate(f'Hs={Hs:.3f} m', xy=(0.7*max_freq, 0.8*max(S)), color='red')
+plt.annotate(f'Tp={Tp:.3f} s', xy=(0.7*max_freq, 0.7*max(S)), color='red')
+
+plt.tight_layout()
+plt.savefig("jonswap_spectrum.png", dpi=150)
+# =====================================================
+
+# 输出数据给bash后续使用
+print(json.dumps({
+    "periods": (1.0/freqs).tolist(),
+    "heights": wave_heights.tolist(),
+    "phases": phases,
+    "dirs": dirs
+}))
+EOF
+)
+
+# ===========================
+# 额外写出waveDict.txt的步骤
+# ===========================
+python3 - <<EOF
+import json
+data=json.loads("""${json}""")
+
+periods=data["periods"]
+heights=data["heights"]
+phases=data["phases"]
+dirs=data["dirs"]
+
+with open("waveDict.txt","w") as f:
+    f.write("/*--------------------------------*- C++ -*----------------------------------*\\\\\n")
+    f.write("| =========                 |                                                 |\n")
+    f.write("| \\\\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |\n")
+    f.write("|  \\\\    /   O peration     | Version:  1.3                                   |\n")
+    f.write("|   \\\\  /    A nd           | Web:      http://www.openfoam.org               |\n")
+    f.write("|    \\\\/     M anipulation  |                                                 |\n")
+    f.write("\\*---------------------------------------------------------------------------*/\n")
+    f.write("FoamFile\n{\n    version     2.0;\n    format      ascii;\n")
+    f.write("    class       dictionary;\n    location    \"constant\";\n    object      waveDict;\n}\n")
+    f.write("// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //\n\n")
+
+    f.write(f"waveType        irregular;\n\ngenAbs          1;\n\nabsDir          0.0;\n\n")
+    f.write(f"nPaddles        {${N_PADDLES}};\n\ntSmooth         {${T_SMOOTH}};\n\n")
+
+    f.write(f"wavePeriods\n{len(periods)}\n(\n")
+    for v in periods:
+        f.write(f"{v:.6f}\n")
+    f.write(");\n\n")
+
+    f.write(f"waveHeights\n{len(heights)}\n(\n")
+    for v in heights:
+        f.write(f"{v:.6f}\n")
+    f.write(");\n\n")
+
+    f.write(f"wavePhases\n{len(phases)}\n(\n")
+    for v in phases:
+        f.write(f"{v:.6f}\n")
+    f.write(");\n\n")
+
+    f.write(f"waveDirs\n{len(dirs)}\n(\n")
+    for v in dirs:
+        f.write(f"{v:.6f}\n")
+    f.write(");\n\n")
+
+    f.write("// ************************************************************************* //\n")
+EOF
+
+echo "✅ waveDict.txt 已生成"
+echo "✅ jonswap_spectrum.png 图像已生成，图中已标注 Hs 与 Tp"
+

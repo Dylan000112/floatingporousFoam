@@ -1,0 +1,84 @@
+#!/bin/bash
+
+G=5
+start=0.01
+step=0.01
+end=100
+rm output*
+
+for i in $(seq $start $step $end); do
+
+	if [[ $i =~ \.[0-9]0$ ]]; then
+        	folder_name=$(printf "%.1f" $i)
+   	else
+        	folder_name=$(printf "%.2f" $i)
+    	fi
+    	
+    	echo "Extract wave gauge from t = $folder_name"
+	
+	if [ -d "./$folder_name" ];then
+	
+		for j in $(seq 0 $((G)));do
+			
+			filename="$folder_name/Gauge${j}_alpha.water.xy"
+		
+			closest_value=$(awk '{
+				if(NR == 1) {
+					closest = $2-0.3;
+					x_value = $1;
+				} else {
+					if (sqrt(($2-0.3)^2) < sqrt((closest)^2)) {
+					closest = $2-0.3;
+					x_value = $1;
+					}
+				}
+				} END {
+					print x_value;
+				}' $filename)
+				
+			echo "$folder_name $closest_value" >> "output_wavegauge_${j}.txt"	
+		done
+	fi			
+
+done
+
+gnuplot_script=$(cat << EOF
+
+set terminal pngcairo size 1200,800
+set output 'Wavegauge_image.png'
+set multiplot layout 2,2 title " "
+
+set title "Wave gauge (UpStream, Y=0)"
+set xlabel "Time (s)"
+set ylabel "WL (m)"
+plot "output_wavegauge_0.txt" using 1:2 with points pt 1 ps 1 lc rgb "red" title 'Gauge0-(X=-80)', \
+     "output_wavegauge_1.txt" using 1:2 with points pt 4 ps 1 lc rgb "blue" title 'Gauge1-(X=-100)', \
+     "output_wavegauge_2.txt" using 1:2 with points pt 7 ps 1 lc rgb "green" title 'Gauge2-(X=-120)'
+
+set title "Wave gauge (DownStream, Y=0)"
+set xlabel "Time (s)"
+set ylabel "WL (m)"
+plot "output_wavegauge_3.txt" using 1:2 with points pt 1 ps 1 lc rgb "red" title 'Gauge3-(X=80)', \
+     "output_wavegauge_4.txt" using 1:2 with points pt 4 ps 1 lc rgb "blue" title 'Gauge4-(X=100)', \
+     "output_wavegauge_5.txt" using 1:2 with points pt 7 ps 1 lc rgb "green" title 'Gauge5-(X=120)'
+
+set title "Wave gauge (Sides, Y=+-80)"
+set xlabel "Time (s)"
+set ylabel "WL (m)"
+plot "output_wavegauge_6.txt" using 1:2 with points pt 1 ps 1 lc rgb "red" title 'Gauge6-(X=-80,Y=80)', \
+     "output_wavegauge_7.txt" using 1:2 with points pt 7 ps 1 lc rgb "blue" title 'Gauge7-(X=-80,Y=-80)', \
+     "output_wavegauge_8.txt" using 1:2 with points pt 3 ps 1 lc rgb "green" title 'Gauge8-(X=0,Y=80)', \
+     "output_wavegauge_9.txt" using 1:2 with points pt 4 ps 1 lc rgb "yellow" title 'Gauge9-(X=0,Y=-80)', \
+     "output_wavegauge_10.txt" using 1:2 with points pt 5 ps 1 lc rgb "black" title 'Gauge10-(X=80,Y=80)', \
+     "output_wavegauge_11.txt" using 1:2 with points pt 6 ps 1 lc rgb "gray" title 'Gauge11-(X=80,Y=-80)'
+
+set title "Wave gauge (Inlet, Y=0)"
+set xlabel "Time (s)"
+set ylabel "WL (m)"
+plot "output_wavegauge_12.txt" using 1:2 with points pt 1 ps 1 lc rgb "red" title 'Gauge12-(X=-180)', \
+     "output_wavegauge_13.txt" using 1:2 with points pt 7 ps 1 lc rgb "blue" title 'Gauge13-(X=-200)'
+
+EOF
+)
+
+echo "$gnuplot_script" | gnuplot

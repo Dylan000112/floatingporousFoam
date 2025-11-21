@@ -1,0 +1,10 @@
+#!/bin/bash
+
+
+echo Running...
+mpirun -np 100 porousolaDyMFlow -parallel > log.olaDyMFlow1
+
+echo reconstruct...
+reconstructPar
+
+echo Simulation complete.
