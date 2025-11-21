@@ -1,0 +1,170 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  5                                     |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      motionProperties;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+motionSolverLibs
+(
+	poroussixDoFRigidBodyMotion
+
+);
+
+dynamicFvMesh       dynamicMotionSolverFvMesh;
+
+motionSolver        sixDoFRigidBodyMotion;
+
+
+sixDoFRigidBodyMotionCoeffs
+{
+   
+    innerDistance   1.732;
+    outerDistance   5;
+       
+    //Rigidbody
+        patches         (floatingObject);
+    	centreOfMass    (0 0 0.57);
+    	rhoSolid        500;
+    	//dimensions
+    	Rx              0;
+    	Ry              0;
+    	Rz              0;        
+    	Rigidmass       #calc "$rhoSolid*$Rx*$Ry*$Rz";
+
+    //Porous
+        poropatches     ("porous");
+    	porosity        0.45;
+    	rhoPoro         680;
+    	//dimensions
+    	Px              0.33;
+    	Py              0.8;
+    	Pz              0.18;        
+    	Poromass        #calc "$rhoPoro*$Px*$Py*$Pz*(1-$porosity)";
+
+    //total       
+        mass  #calc "$Rigidmass+$Poromass";
+        
+    //centerOfRotation
+        M_poro          #calc "$Px*(1-$porosity)*$rhoPoro*$Px*0.5";
+        M_Rigid         #calc "$Rx*$rhoSolid*($Px+$Rx*0.5)";
+        Ro_x1           #calc "($M_poro+$M_Rigid)/($Px*(1-$porosity)*$rhoPoro + $Rx*$rhoSolid)";
+        Ro_x2           #calc "($Ro_x1-$Px)-$Rx*0.5";            
+        centreOfRotation  (0  0  0.57);  
+
+    //momentOfInertia
+	momentOfInertia #codeStream
+	{
+		codeInclude
+		#{
+    	        #include "diagTensor.H"
+		#};
+
+		code
+		#{
+			scalar sqrLx = sqr($Rx+$Px);
+			scalar sqrLy = sqr($Ry+$Py);
+			scalar sqrLz = sqr($Rz+$Pz);
+			os  <<
+             	    $mass
+             	   *diagTensor(sqrLy + sqrLz, sqrLx + sqrLz, sqrLx + sqrLy)/12.0;
+		#};
+	};
+
+
+    report          on;
+    accelerationRelaxation 0.7;
+    //accelerationDamping 0;
+
+    solver
+    {
+        type Newmark;
+    }
+
+    constraints
+    {
+    	/*
+        fixedPoint
+        {
+             sixDoFRigidBodyMotionConstraint point;
+             centreOfRotation (0.0 0.0 0.53);
+        }*/
+
+
+        fixedLine
+        {
+            sixDoFRigidBodyMotionConstraint line;
+            centreOfRotation (0 0 0.57);
+            direction (0 0 1);
+        }
+
+	   
+        fixedAxis
+        {
+            sixDoFRigidBodyMotionConstraint axis;
+            axis (0 1 0);
+        }    
+        
+        fixedAxis
+        {
+            sixDoFRigidBodyMotionConstraint axis;
+            axis (1 0 0);
+        }      
+        
+        fixedAxis
+        {
+            sixDoFRigidBodyMotionConstraint axis;
+            axis (0 0 1);
+        }        
+    }
+    
+    
+    restraints
+    {
+    /*
+        moorDynR2
+        {
+            sixDoFRigidBodyMotionRestraint moorDynR2;            
+            couplingMode       "BODY";
+            inputFile                      "Mooring/lines_v2.txt";
+            writeMooringVTK                true;
+            //vtkPrefix         "mdv2_body";
+            vtkStartTime       0;
+            outerCorrector     3;
+        }
+     
+        
+        moodyR
+        {
+            sixDoFRigidBodyMotionRestraint moodyR;
+            inputFile              "Mooring/boxWu_exPoint.m";
+            couplingMode           "externalPoint";  // or "externalRigidBody"
+            //If couplingMode is "externalPoint", nCouplingDof = 3*refAttachmentPt.size()
+            nCouplingDof           6;
+            refAttachmentPt
+            (
+                (-0.25      0.4    0.43)
+                (-0.25     -0.4    0.43)
+                ( 0.25      0.4    0.43)
+                ( 0.25     -0.4    0.43)
+            );
+            waveKinematics         false;
+            twoD                   true;
+        }
+     
+ */
+    }
+
+}
+
+
+// ************************************************************************* //
