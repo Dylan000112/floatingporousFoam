@@ -1,0 +1,29 @@
+#!/bin/bash
+
+# Source tutorial run functions
+. $WM_PROJECT_DIR/bin/tools/RunFunctions
+
+./cleanCase
+
+
+# Snappy
+mkdir 0
+rm ./system/decomposeParDict
+cp ./system/decomposeParDict_pre ./system/decomposeParDict
+nProc=$(getNumberOfProcessors)
+
+runApplication blockMesh
+runApplication surfaceFeatureExtract
+runApplication decomposePar
+
+mesh_application="mpirun -np $nProc snappyHexMesh -overwrite -parallel"
+runApplication $mesh_application
+mv log.mpirun log.snappyHexMesh
+
+runApplication reconstructParMesh -mergeTol 1e-06 -latestTime -constant
+
+#  Run
+rm -r 0
+rm -r processor*
+rm log.mpirun
+rm log.decomposePar

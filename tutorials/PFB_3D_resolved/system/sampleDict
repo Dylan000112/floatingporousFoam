@@ -1,0 +1,95 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  1.7.1                                 |
+|   \\  /    A nd           | Web:      www.OpenFOAM.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      sampleDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+interpolationScheme cellPoint;
+
+setFormat       raw;
+
+surfaceFormat   raw;
+
+sets
+(
+
+    Gauge0
+    {
+        type         midPointAndFace;
+        axis         z;
+        start        ( -1.6 0.001 0.5 ); 
+        end          ( -1.6 0.001 0.8 );
+        nPoints      160;
+    }
+ 
+    Gauge1
+    {
+        type         midPointAndFace;
+        axis         z;
+        start        ( -1.3 0.001 0.5 );  
+        end          ( -1.3 0.001 0.8 );
+        npoints      160;
+    }
+
+    Gauge2
+    {
+        type         midPointAndFace;
+        axis         z;
+        start        ( -0.8 0.001 0.5 );  
+        end          ( -0.8 0.001 0.8 );
+        npoints      160;
+    }
+
+    Gauge3
+    {
+        type         midPointAndFace;
+        axis         z;
+        start        ( 0.8 0.001 0.5 );  
+        end          ( 0.8 0.001 0.8 );
+        nPoints      160;
+    }
+ 
+    Gauge4
+    {
+        type         midPointAndFace;
+        axis         z;
+        start        ( 1.1 0.001 0.5 ); 
+        end          ( 1.1 0.001 0.8 );
+        npoints      160;
+    }
+
+    Gauge5
+    {
+        type         midPointAndFace;
+        axis         z;
+        start        ( 1.6 0.001 0.5 ); 
+        end          ( 1.6 0.001 0.8 );
+        npoints      160;
+    }
+    
+    
+
+);
+
+
+surfaces        ();
+
+fields          ( alpha.water );
+
+type sets;
+
+libs ("libsampling.so");
+
+writeControl    adjustableRunTime;
+writeInterval   0.01;

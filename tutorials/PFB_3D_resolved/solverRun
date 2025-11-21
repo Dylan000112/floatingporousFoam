@@ -1,0 +1,39 @@
+#!/bin/bash
+
+# Source tutorial run functions
+. $WM_PROJECT_DIR/bin/tools/RunFunctions
+
+rm -r 0
+rm -r processor*
+rm log.setFields
+rm log.decomposePar
+rm log.mpirun
+rm log.topoSet
+
+restore0Dir
+runApplication topoSet
+runApplication createPatch -overwrite
+runApplication setFields
+
+rm ./system/decomposeParDict
+cp ./system/decomposeParDict_solver ./system/decomposeParDict
+nProc=$(getNumberOfProcessors)
+runApplication decomposePar
+
+renumber_application="mpirun -np $nProc renumberMesh -overwrite -parallel"
+runApplication $renumber_application
+mv log.mpirun log.renumberMesh
+
+nProc=$(getNumberOfProcessors)
+solver="mpirun -np $nProc olaDyMFlow -parallel"
+
+runApplication $solver
+mv log.mpirun log.olaDymFlow
+
+
+echo reconstruct...
+reconstructPar
+
+#rm -r processor*
+
+echo Simulation complete.

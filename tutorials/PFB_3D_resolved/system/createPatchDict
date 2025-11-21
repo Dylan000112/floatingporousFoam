@@ -1,0 +1,43 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  5                                     |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      topoSetDict;
+}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+
+pointSync false;
+
+patches
+(
+    {
+        name BB1;       // 给你的球起个新名字
+        patchInfo { type wall; }
+        constructFrom set;
+        set B1;         // 对应 topoSet 里的名字
+    }
+    {
+        name BB2;       // 给你的球起个新名字
+        patchInfo { type wall; }
+        constructFrom set;
+        set B2;         // 对应 topoSet 里的名字
+    }
+    {
+        name BB3;       // 给你的球起个新名字
+        patchInfo { type wall; }
+        constructFrom set;
+        set B3;         // 对应 topoSet 里的名字
+    }
+);
+
+// ************************************************************************* //

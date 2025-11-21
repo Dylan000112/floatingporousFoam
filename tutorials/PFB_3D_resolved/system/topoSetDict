@@ -1,0 +1,91 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  5                                     |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      topoSetDict;
+}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+actions
+(
+// Front
+    {
+        name    b1;
+        type    faceSet;
+        action  new;
+        source  boxToFace;
+        box     (-0.4025  0.2125  0.45) (-0.3675  0.2475  0.75);
+    }
+    {
+        name    B1; // 这个给 createPatch 用
+        type    faceSet;
+        action  new;
+        source  faceToFace;
+        set     b1;
+    }
+    {
+        name    B1;
+        type    faceSet;
+        action  subset;      // 关键：取交集
+        source  patchToFace;
+        patch   floater;       // 这里写那个混在一起的大Patch名字，如果是所有边界可用 ".*"
+    }
+
+// Middle
+    {
+        name    b2;
+        type    faceSet;
+        action  new;
+        source  boxToFace;
+        box     (0.0175  0.2125  0.45) (0.0525  0.2475  0.75);
+    }
+    {
+        name    B2; // 这个给 createPatch 用
+        type    faceSet;
+        action  new;
+        source  faceToFace;
+        set     b2;
+    }
+    {
+        name    B2;
+        type    faceSet;
+        action  subset;      // 关键：取交集
+        source  patchToFace;
+        patch   floater;       // 这里写那个混在一起的大Patch名字，如果是所有边界可用 ".*"
+    }
+
+// End
+    {
+        name    b3;
+        type    faceSet;
+        action  new;
+        source  boxToFace;
+        box     (0.3675  0.2125  0.45) (0.4025  0.2475  0.75);
+    }
+    {
+        name    B3; // 这个给 createPatch 用
+        type    faceSet;
+        action  new;
+        source  faceToFace;
+        set     b3;
+    }
+    {
+        name    B3;
+        type    faceSet;
+        action  subset;      // 关键：取交集
+        source  patchToFace;
+        patch   floater;       // 这里写那个混在一起的大Patch名字，如果是所有边界可用 ".*"
+    }
+     
+);
+
+// ************************************************************************* //
