@@ -1,0 +1,161 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  5                                     |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      blockMeshDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+scale 1;
+
+X0    -6;
+X1     6;
+
+Y0    -6;
+Y1     6;
+
+Z0     0.0;
+Z1     0.4;
+Z2     0.7;
+Z3     1.1;
+
+nx  150;
+
+ny   150;
+
+nz1  30;
+nz2  50;
+nz3  25;
+
+vertices
+(
+// floor1
+    ($X0 $Y0 $Z0)//0
+    ($X1 $Y0 $Z0)//1
+    ($X1 $Y1 $Z0)//2
+    ($X0 $Y1 $Z0)//3
+// floor2    
+    ($X0 $Y0 $Z1)//4
+    ($X1 $Y0 $Z1)
+    ($X1 $Y1 $Z1)
+    ($X0 $Y1 $Z1)//7
+// floor3    
+    ($X0 $Y0 $Z2)//8
+    ($X1 $Y0 $Z2)
+    ($X1 $Y1 $Z2)
+    ($X0 $Y1 $Z2)//11
+// floor4    
+    ($X0 $Y0 $Z3)//12
+    ($X1 $Y0 $Z3)
+    ($X1 $Y1 $Z3)
+    ($X0 $Y1 $Z3)//15
+);
+
+
+
+// X 1/80 130+10
+
+blocks
+(
+    hex (0 1 2 3 4 5 6 7) ($nx $ny $nz1) simpleGrading 
+     (
+          ( (0.875  0.94  1) (0.125  0.06  4) ) 
+          ( (0.875  0.94  1) (0.125  0.06  4) ) 
+          0.33 
+     ) 
+    hex (4 5 6 7 8 9 10 11) ($nx $ny $nz2) simpleGrading 
+     (
+          ( (0.875  0.94  1) (0.125  0.06  4) ) 
+          ( (0.875  0.94  1) (0.125  0.06  4) ) 
+          1 
+     ) 
+    hex (8 9 10 11 12 13 14 15) ($nx $ny $nz3) simpleGrading 
+     (
+          ( (0.875  0.94  1) (0.125  0.06  4) ) 
+          ( (0.875  0.94  1) (0.125  0.06  4) ) 
+          4 
+     ) 
+);
+
+edges
+(
+);
+
+boundary
+(
+    left
+    {
+        type patch;
+        faces
+        (
+            (0 4 7 3)
+            (4 8 11 7)
+            (8 12 15 11)
+        );
+    }
+    right
+    {
+        type patch;
+        faces
+        (
+            (1 2 6 5)
+            (5 6 10 9)
+            (9 10 14 13)
+        );
+    }
+    stationaryWalls
+    {
+        type wall;
+        faces
+        (
+            (0 3 2 1)
+        );
+    }
+    atmosphere
+    {
+        type patch;
+        faces
+        (
+            (12 13 14 15)
+        );
+    }
+    front
+    {
+        type patch;
+        faces
+        (
+            (0 1 5 4)
+            (4 5 9 8)
+            (8 9 13 12)
+        );
+    }
+    back
+    {
+        type patch;
+        faces
+        (
+            (2 3 7 6)
+            (6 7 11 10)
+            (10 11 15 14)
+        );
+    }
+    floatingObject
+    {
+        type wall;
+        faces ();
+    }
+);
+
+mergePatchPairs
+(
+);
+
+// ************************************************************************* //

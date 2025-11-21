@@ -1,0 +1,144 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  5                                     |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      topoSetDict;
+}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+actions
+(
+   {
+        name    p1;
+        type    cellSet;
+        action  new;  //add,delete,subset,clear,invert,remove
+        source  boxToCell;
+        sourceInfo
+        {
+            box (-0.45 -0.4 0.43) (-0.35  0.4  0.65);
+        }
+    }
+    {
+        name    p2;
+        type    cellSet;
+        action  new;  //add,delete,subset,clear,invert,remove
+        source  boxToCell;
+        sourceInfo
+        {
+            box (-0.35 -0.4 0.57) (-0.05  0.4  0.65);
+        }
+    }
+        {
+        name    p3;
+        type    cellSet;
+        action  new;  //add,delete,subset,clear,invert,remove
+        source  boxToCell;
+        sourceInfo
+        {
+            box (-0.05 -0.4 0.43) (0.05  0.4  0.65);
+        }
+    }
+    {
+        name    p4;
+        type    cellSet;
+        action  new;  //add,delete,subset,clear,invert,remove
+        source  boxToCell;
+        sourceInfo
+        {
+            box (0.05 -0.4 0.57) (0.35  0.4  0.65);
+        }
+    }
+        {
+        name    p5;
+        type    cellSet;
+        action  new;  //add,delete,subset,clear,invert,remove
+        source  boxToCell;
+        sourceInfo
+        {
+            box (0.35 -0.4 0.43) (0.45  0.4  0.65);
+        }
+    }
+
+    {
+        name    c2;
+        type    cellSet;
+        action  new;
+        source  boxToCell;
+        sourceInfo
+        {
+            box (-0.15 -0.4 0.57) (-0.15  -0.4  0.57);
+        }
+    } 
+   {
+        name    c2;
+        type    cellSet;
+        action  add;//,delete,subset,clear,invert,remove
+        source   cellToCell;
+        sourceInfo
+        {
+            set     p1;
+        }
+    }
+       {
+        name    c2;
+        type    cellSet;
+        action  add;//,delete,subset,clear,invert,remove
+        source   cellToCell;
+        sourceInfo
+        {
+            set     p2;
+        }
+    }
+       {
+        name    c2;
+        type    cellSet;
+        action  add;//,delete,subset,clear,invert,remove
+        source   cellToCell;
+        sourceInfo
+        {
+            set     p3;
+        }
+    }
+       {
+        name    c2;
+        type    cellSet;
+        action  add;//,delete,subset,clear,invert,remove
+        source   cellToCell;
+        sourceInfo
+        {
+            set     p4;
+        }
+    }
+       {
+        name    c2;
+        type    cellSet;
+        action  add;//,delete,subset,clear,invert,remove
+        source   cellToCell;
+        sourceInfo
+        {
+            set     p5;
+        }
+    }
+
+    {
+        name    porous;
+        type    cellZoneSet;
+        action  new;  //add,delete,subset,clear,invert,remove
+        source  setToCellZone;
+        sourceInfo
+        {
+        set     c2;
+        }
+    } 
+);
+
+// ************************************************************************* //

@@ -1,0 +1,78 @@
+#!/bin/bash
+
+depth=(-480 -450 -400 -350 -300 -250 -200 -150) 
+start=0.5
+step=0.5
+end=135
+rm output*
+
+for i in $(seq $start $step $end); do
+
+	if [[ $i =~ \.[0-9]$ ]]; then
+        	folder_name=$(printf "%.1f" $i)
+   	else
+        	folder_name=$(printf "%.2f" $i)
+    	fi
+    	
+    	echo "Extract U from t = $folder_name"
+	
+	if [ -d "./$folder_name" ];then
+	
+		for j in "${depth[@]}";do
+			
+			filename="$folder_name/Gauge0_U.xy"
+		
+			closest_value=$(awk -v j="$j" '{
+				if(NR == 1) {
+					closest = $1-j;
+					x_value = $2;
+				} else {
+					if (sqrt(($1-j)^2) < sqrt((closest)^2)) {
+					closest = $1-j;
+					x_value = $2;
+					}
+				}
+				} END {
+					print x_value;
+				}' $filename)
+				
+			echo "$folder_name $closest_value" >> "output_U_${j}.txt"	
+		done
+	fi			
+
+done
+
+gnuplot_script=$(cat << EOF
+
+set terminal pngcairo size 1200,800
+set output 'U.png'
+set multiplot layout 2,2 title " "
+
+set title "U"
+set xlabel "Time (s)"
+set ylabel "U (m/s)"
+plot "output_U_-480.txt" using 1:2 with lines  lc rgb "red" title 'U-(X=-480)', \
+     "output_U_-450.txt" using 1:2 with lines  lc rgb "blue" title 'U-(X=-450)' 
+
+set title "U"
+set xlabel "Time (s)"
+set ylabel "U (m/s)"
+plot "output_U_-400.txt" using 1:2 with lines  lc rgb "red" title 'U-(X=-400)', \
+     "output_U_-350.txt" using 1:2 with lines  lc rgb "blue" title 'U-(X=-350)' 
+
+set title "U"
+set xlabel "Time (s)"
+set ylabel "U (m/s)"
+plot "output_U_-300.txt" using 1:2 with lines  lc rgb "red" title 'U-(X=-300)', \
+     "output_U_-250.txt" using 1:2 with lines  lc rgb "blue" title 'U-(X=-250)'
+
+set title "U"
+set xlabel "Time (s)"
+set ylabel "U (m/s)"
+plot "output_U_-200.txt" using 1:2 with lines  lc rgb "red" title 'U-(X=-200)', \
+     "output_U_-150.txt" using 1:2 with lines  lc rgb "blue" title 'U-(X=-150)'
+
+EOF
+)
+
+echo "$gnuplot_script" | gnuplot
