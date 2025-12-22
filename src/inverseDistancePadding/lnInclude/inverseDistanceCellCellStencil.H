@@ -1,1 +1,0 @@
-../Origin/inverseDistanceCellCellStencil.H
