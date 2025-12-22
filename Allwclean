@@ -10,3 +10,6 @@ echo "Clean porousolaFlow..."
 
 echo "Clean porousolaFlow..."
 (cd poroussixDoFRigidBodyMotion && wclean)
+
+echo "Compling inverseDistancePadding..."
+(cd inverseDistancePadding && wclean)
