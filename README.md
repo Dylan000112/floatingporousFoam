@@ -3,6 +3,8 @@
 
 [**FloatingporousFoam**](https://www.youtube.com/watch?v=D-EE6wJXsYc) is a library for simulating porous structure's motion under wave and current in OpenFOAM.
 
+[Resolved porous structure](https://www.youtube.com/watch?v=YVBLNHlsD24)
+
 ## Usage
 Cases have been tested for OpenFOAM v2206 only.
 
