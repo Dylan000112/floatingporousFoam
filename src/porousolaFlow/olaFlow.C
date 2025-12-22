@@ -86,6 +86,9 @@ Description
 
 #include "porousforces.H"
 
+// 【新增】引用清洗函数
+#include "cleanOversetHoles.H" 
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 int main(int argc, char *argv[])
@@ -196,6 +199,10 @@ int main(int argc, char *argv[])
 
             #include "alphaControls.H"
             #include "alphaEqnSubCycle.H"
+            
+            
+            // [HoleClean] 
+            cleanOversetHoles(mesh);
 
             mixture.correct();
 
@@ -205,31 +212,72 @@ int main(int argc, char *argv[])
             }
 
 
-           //transport UR - be uesd in UEqu.H
-	   const dictionary& dbDictionary = 
-		runTime.lookupObject<IOdictionary>("motion");  	   
-	   const vectorField Md = dbDictionary.lookupOrDefault("Md", Md) ;
-	   const vector Linear_vel_ = dbDictionary.lookupOrDefault("Linear_vel_", Linear_vel_) ;
-	   const vector Angular_vel_ = dbDictionary.lookupOrDefault("Angular_vel_", Angular_vel_) ;
-        
-           volVectorField UR = U;
-	  
-	   const label ZoneID = mesh.cellZones().findZoneID("porous");
-	   const labelList& cells = mesh.cellZones()[ZoneID];	 	     	   
+            // Calculate relative velocity field (UR) for momentum equation
+            const dictionary& motionDict = 
+                runTime.lookupObject<IOdictionary>("motion");
 
-	   forAll(cells, i)
-           {   
-	       UR[cells[i]][0] = U[cells[i]][0] - Linear_vel_[0] - Angular_vel_[1] * Md[i][2] + Angular_vel_[2] * Md[i][1] ;
-	       UR[cells[i]][1] = U[cells[i]][1] - Linear_vel_[1] - Angular_vel_[2] * Md[i][0] + Angular_vel_[0] * Md[i][2] ;
-	       UR[cells[i]][2] = U[cells[i]][2] - Linear_vel_[2] - Angular_vel_[0] * Md[i][1] + Angular_vel_[1] * Md[i][0] ;
-	   };
+            // Retrieve motion parameters
+            // Md: Lever arm vector field (r)
+            const vectorField Md = 
+                motionDict.lookupOrDefault("Md", Md);
+            
+            const vector linVel = 
+                motionDict.lookupOrDefault("Linear_vel_", linVel);
+            
+            const vector angVel = 
+                motionDict.lookupOrDefault("Angular_vel_", angVel);
+
+            // Initialize relative velocity field
+            volVectorField UR = U;
+
+            // Update UR in the porous cell zone
+            const label zoneID = mesh.cellZones().findZoneID("porous");
+
+            if (zoneID != -1)
+            {
+                const labelList& cells = mesh.cellZones()[zoneID];
+
+                // Check if Md size matches the zone size to avoid segmentation faults
+                if (Md.size() == cells.size())
+                {
+                    forAll(cells, i)
+                    {
+                        const label cellI = cells[i];
+
+                        // Vector operation: U_rel = U_abs - V_lin - (omega ^ r)
+                        // Operator '^' denotes the cross product in OpenFOAM
+                        UR[cellI] = U[cellI] - linVel - (angVel ^ Md[i]);
+                    }
+                }
+                else if (Pstream::master())
+                {
+                    WarningInFunction
+                        << "Size mismatch: 'Md' field size (" << Md.size() 
+                        << ") does not match 'porous' zone size (" << cells.size() << ")."
+                        << endl;
+                }
+            }
+            else if (Pstream::master())
+            {
+                // Warn if the porous zone is missing
+                WarningInFunction
+                    << "Cell zone 'porous' not found. Relative velocity UR not updated."
+                    << endl;
+            }
 
             #include "UEqn.H"
+            
+            //  [HoleClean]  
+	    cleanOversetHoles(mesh);
 
             // --- Pressure corrector loop
             while (pimple.correct())
             {
                 #include "pEqn.H"
+                
+
+                // [HoleClean] 
+                cleanOversetHoles(mesh);
             }
 
             if (pimple.turbCorr())

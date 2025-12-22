@@ -117,24 +117,92 @@ Foam::sixDoFRigidBodyMotionSolver::sixDoFRigidBodyMotionSolver
         coeffDict().readEntry("rhoInf", rhoInf_);
     }
 
+/**************************************************************************************************/
     // Calculate scaling factor everywhere
 
+    // ... 在 sixDoFRigidBodyMotionSolver 构造函数中 ...
+    
     {
         const pointMesh& pMesh = pointMesh::New(mesh);
 
+        // 1. 初始化距离场为 "无穷大" (GREAT)
+        // 这一步对 Overset 至关重要，保证了没被计算的点（背景网格）距离永远是无限大
         pointPatchDist pDist(pMesh, patchSet_, points0());        
-                
-        //sphere dynamicmesh
-        vectorField cOfRDist(points0() - motion_.centreOfRotation()); 
-        
-        forAll(cOfRDist, i)
-        {  
-            pDist[i] = sqrt(cOfRDist[i][0]*cOfRDist[i][0]/(motion_.Px()/2)/(motion_.Px()/2)+
-            		cOfRDist[i][1]*cOfRDist[i][1]/(motion_.Py()/2)/(motion_.Py()/2)+
-            		cOfRDist[i][2]*cOfRDist[i][2]/(motion_.Pz()/2)/(motion_.Pz()/2));      
+        pDist.primitiveFieldRef() = Foam::GREAT; 
+
+        // 2. 读取用户开关 "overset"
+        // 默认为 false，即默认当作普通动网格处理
+        const bool isOverset = coeffDict().getOrDefault("overset", false);
+
+        const pointField& pts = points0();
+        scalarField& pDistField = pDist.primitiveFieldRef();
+
+        // 预计算几何参数
+        const vector cofr = motion_.centreOfRotation();
+        // 防止除以0，加一个极小值检查
+        const scalar Px_sq = sqr(motion_.Px() > SMALL ? motion_.Px()/2.0 : 1.0);
+        const scalar Py_sq = sqr(motion_.Py() > SMALL ? motion_.Py()/2.0 : 1.0);
+        const scalar Pz_sq = sqr(motion_.Pz() > SMALL ? motion_.Pz()/2.0 : 1.0);
+
+        // =========================================================
+        // 分支逻辑：Overset (拓扑隔离) vs DynamicMesh (全场变形)
+        // =========================================================
+
+        if (isOverset)
+        {
+            // --- 模式 A: Overset 模式 ---
+            
+            // 必须提供 Zone 的名字
+            if (!coeffDict().found("porousZone"))
+            {
+                FatalErrorInFunction 
+                    << "You set 'overset on', so you must specify 'porousZone' name!" 
+                    << exit(FatalError);
+            }
+            
+            word zoneName = coeffDict().get<word>("porousZone");
+            
+            Info << "SixDoF: Overset mode ON. limiting motion to zone: " << zoneName << endl;
+
+            const label zoneID = mesh.pointZones().findZoneID(zoneName);
+            if (zoneID == -1)
+            {
+                FatalErrorInFunction 
+                    << "PointZone '" << zoneName << "' not found in polyMesh." 
+                    << " Please run topoSet."
+                    << exit(FatalError);
+            }
+
+            const labelList& zonePoints = mesh.pointZones()[zoneID];
+
+            // 只循环 Zone 里的点
+            forAll(zonePoints, i)
+            {
+                label pointI = zonePoints[i];
+                vector d = pts[pointI] - cofr;
+                pDistField[pointI] = sqrt(
+                    (d.x()*d.x())/Px_sq + (d.y()*d.y())/Py_sq + (d.z()*d.z())/Pz_sq
+                );
+            }
         }
-                  
-        // Scaling: 1 up to di then linear down to 0 at do away from patches
+        else
+        {
+            // --- 模式 B: 普通动网格模式 (变形) ---
+            
+            Info << "SixDoF: Overset mode OFF. Applying global deformation." << endl;
+
+            // 循环全场所有点
+            forAll(pts, pointI)
+            {
+                vector d = pts[pointI] - cofr;
+                pDistField[pointI] = sqrt(
+                    (d.x()*d.x())/Px_sq + (d.y()*d.y())/Py_sq + (d.z()*d.z())/Pz_sq
+                );
+            }
+        }
+
+        // 3. 计算 Scale (通用)
+        // Overset模式下：背景网格 pDist=GREAT -> scale=0 -> 不动
         scale_.primitiveFieldRef() =
             min
             (
@@ -145,6 +213,8 @@ Foam::sixDoFRigidBodyMotionSolver::sixDoFRigidBodyMotionSolver
                 ),
                 scalar(1)
             );
+
+
 
         // Convert the scale function to a cosine
         scale_.primitiveFieldRef() =
@@ -164,6 +234,10 @@ Foam::sixDoFRigidBodyMotionSolver::sixDoFRigidBodyMotionSolver
         scale_.write();
     }
 }
+
+
+/**************************************************************************************************/
+
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
@@ -323,6 +397,12 @@ void Foam::sixDoFRigidBodyMotionSolver::solve()
     (
         pointDisplacement_.mesh()
     ).constrainDisplacement(pointDisplacement_);
+    
+    
+    if (mesh().time().writeTime())
+    {
+        this->writeObject(IOstreamOption(), true);
+    }
 }
 
 
@@ -341,13 +421,16 @@ bool Foam::sixDoFRigidBodyMotionSolver::writeObject
             "uniform",
             mesh(),
             IOobject::NO_READ,
-            IOobject::NO_WRITE,
+            IOobject::AUTO_WRITE,
             false
         )
     );
 
     motion_.state().write(dict);
+    
+    
     return dict.regIOobject::write();
+    
 }
 
 

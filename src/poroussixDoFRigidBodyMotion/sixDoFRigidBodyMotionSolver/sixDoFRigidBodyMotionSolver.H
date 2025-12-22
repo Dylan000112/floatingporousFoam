@@ -75,6 +75,8 @@ class sixDoFRigidBodyMotionSolver
 
         //- Outer morphing distance (limit of linear interpolation region)
         const scalar do_;
+        
+        const scalar cramp_;
 
         //- Test-mode in which only the gravitational body-force is applied
         bool test_;
