@@ -8,5 +8,8 @@ echo "Compling porousforce..."
 echo "Compling porousolaFlow..."
 (cd porousolaFlow && ./allMake)
 
-echo "Compling porousolaFlow..."
+echo "Compling poroussixDoFRigidBodyMotion..."
 (cd poroussixDoFRigidBodyMotion && wmake libso)
+
+echo "Compling inverseDistancePadding..."
+(cd inverseDistancePadding && wmake libso)
