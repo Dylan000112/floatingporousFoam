@@ -1,0 +1,35 @@
+#!/bin/bash
+
+./cleanCase
+
+mkdir 0
+
+
+echo Background blockMesh meshing...
+blockMesh 
+
+
+echo Merge meshing...
+mergeMeshes . ../overset -overwrite
+
+echo Creating floating object...
+topoSet 
+
+
+echo Preparing 0 folder...
+rm -fr 0
+cp -r 0.org 0
+
+echo Setting the fields...
+setFields 
+
+echo decompose...
+decomposePar
+
+echo Running...
+mpirun -np 9 porousolaDyMFlow -parallel > log.olaDyMFlow
+
+echo reconstruct...
+reconstructPar
+
+echo Simulation complete.

@@ -1,0 +1,113 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  v2206                                 |
+|   \\  /    A nd           | Web:      www.OpenFOAM.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      fvSolution;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+solvers
+{
+    "alpha.water.*"
+    {
+        nAlphaCorr      2;
+        nAlphaSubCycles 1;
+        cAlpha          1;
+
+        MULESCorr       no;
+        nLimiterIter    5;
+        alphaApplyPrevCorr  yes;
+
+        solver          smoothSolver;
+        smoother        symGaussSeidel;
+        tolerance       1e-8;
+        relTol          0;
+    }
+
+    // [修改] pcorr 必须使用非对称求解器
+    "pcorr.*"
+    {
+        solver          PBiCGStab; // 原 PCG 改为 PBiCGStab
+        preconditioner  DILU;      // 配合 PBiCGStab 使用 DILU
+        tolerance       1e-05;
+        relTol          0;
+        maxIter         100;
+    }
+
+    // [修改] p_rgh 在重叠网格中通常也是非对称的
+    p_rgh
+    {
+        solver          GAMG;
+        tolerance       1e-8;
+        relTol          0.01;
+        
+        // [关键] DIC (对称) 改为 GaussSeidel 或 symGaussSeidel (通用)
+        smoother        GaussSeidel; 
+        
+        cacheAgglomeration no; // Overset网格拓扑变化时，建议关闭缓存
+    }
+
+    // [修改] Final 步也必须改为非对称
+    p_rghFinal
+    {
+        solver          PBiCGStab; // 原 PCG 改为 PBiCGStab (或者保持 GAMG)
+        preconditioner  DILU;      // 原 GAMG预条件/DIC 改为 DILU
+        
+        // 或者如果你想用 GAMG 作为 Final solver:
+        /*
+        solver          GAMG;
+        smoother        GaussSeidel;
+        */
+
+        tolerance       1e-8;
+        relTol          0;
+        maxIter         20;
+    }
+
+    "(U|k|epsilon)"
+    {
+        solver          smoothSolver;
+        smoother        GaussSeidel;
+        tolerance       1e-6;
+        relTol          0.1;
+        nSweeps         1;
+    }
+
+    "(U|k|epsilon)Final"
+    {
+        solver          smoothSolver;
+        smoother        GaussSeidel;
+        tolerance       1e-6;
+        relTol          0;
+        nSweeps         1;
+    }
+}
+
+PIMPLE
+{
+    momentumPredictor   no;
+    nOuterCorrectors    3;
+    nCorrectors         1;
+    nNonOrthogonalCorrectors 0;
+    correctPhi          yes;
+    moveMeshOuterCorrectors yes;
+}
+
+relaxationFactors
+{
+    equations
+    {
+        ".*" 1;
+    }
+}
+
+// ************************************************************************* //
