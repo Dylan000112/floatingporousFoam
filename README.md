@@ -7,7 +7,7 @@
 
 [![Image loading](./doc/Resolved.png)](https://www.youtube.com/watch?v=YVBLNHlsD24)
 
-[Resolved porous structure](https://www.youtube.com/watch?v=YVBLNHlsD24).
+[Fully resolved porous structure](https://www.youtube.com/watch?v=YVBLNHlsD24).
 
 ## Usage
 Cases have been tested for OpenFOAM v2206 only.
