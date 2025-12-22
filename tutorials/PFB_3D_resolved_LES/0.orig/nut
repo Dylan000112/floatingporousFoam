@@ -1,0 +1,58 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  5                                     |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       volScalarField;
+    location    "0";
+    object      nut;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+dimensions      [0 2 -1 0 0 0 0];
+
+internalField   uniform 0;
+
+boundaryField
+{
+
+    "(outlet|inlet|atmosphere)"
+    {
+        // [保持不变] 
+        // IDDES 会根据 k 和 omega 自动计算内部和边界处的 nut
+        // 对于入口，通常假设无湍流粘度 (nut=0)
+        type            calculated;
+        value           uniform 0;
+    }
+
+    "(stationaryWalls|floater|BB1|BB2|BB3|BB4|BB5|BB6|BB7|BB8|BB9)"
+    {
+        // [核心重点] 保持壁面函数！
+        // WMLES 的 "WM" (Wall-Modeled) 就是靠这个边界条件实现的。
+        // 它告诉求解器：在壁面这层网格，请用 RANS 逻辑来算剪切力。
+        
+        type            nutkWallFunction; 
+        
+        // 进阶选项：如果你的网格 y+ 变化很大 (有的地方 < 5，有的地方 > 30)
+        // 推荐改为：type  nutUSpaldingWallFunction;
+        // Spalding 函数能同时适应粘性底层和对数律层。
+        
+        value           uniform 0;
+    }
+    
+    "(front|back)"
+    {
+    	type            nutkWallFunction; 
+    	value           uniform 0;
+        //type            cyclicAMI;
+    }
+
+}
+
+// ************************************************************************* //

@@ -1,0 +1,121 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  5                                     |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      fvSchemes;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+ddtSchemes
+{
+    // [修改点1] 时间离散
+    // RANS: Euler (一阶) -> WMLES: backward (二阶)
+    // 原理：LES 需要追踪瞬态涡的演化，一阶格式的数值误差会像粘度一样抹平涡结构。
+
+    // 1. 全局默认用 backward (二阶)，保证 U, k, omega 的 LES 精度
+    default         backward;
+    
+    // 2. [修复报错] 强制 alpha.water 使用 Euler
+    // VOF 求解器不支持 backward，必须单独指定
+    ddt(alpha.water) Euler;  // 标准 OpenFOAM v2206 写法
+    ddt(alpha)       Euler;  // olaFlow 某些旧版本或内部机制写法
+    ddt(alpha1)      Euler;  // 兼容性写法
+
+}
+
+gradSchemes
+{
+    default         Gauss linear;
+    // 如果网格有扭曲，为了防止梯度爆炸，可以对速度梯度加限制
+    // 但一般 LES 要求好网格，所以保持 Gauss linear 即可
+    grad(p)         Gauss linear;
+    grad(p_rgh)     Gauss linear;
+    grad(U)         Gauss linear;
+}
+
+divSchemes
+{
+    default         none;
+    
+    // [修改点2] 动量方程对流项 div(rho*U*U)
+    // RANS: limitedLinearV (有耗散) -> WMLES: LUST (低耗散)
+    // LUST = 75% Linear (中心差分) + 25% LinearUpwind
+    // 原理：这是混合模拟的标准配置。既能像 LES 一样解析涡，又保留一点点迎风格式的稳定性以防止发散。
+    // 严禁使用 upwind！
+    div(rhoPhi,U)   Gauss LUST grad(U);
+    
+    // 如果涉及孔隙介质(Porosity)，同理
+    div((rhoPhi|interpolate(porosity)),U)  Gauss LUST grad(U);
+    
+    // [修改点3] VOF 界面压缩 (水/气界面)
+    // 保持不变。这与湍流模型无关，这是为了保持水面尖锐。
+    div(phi,alpha)  Gauss interfaceCompression;
+    div(phirb,alpha) Gauss interfaceCompression;
+    
+    // [修改点4] 湍流标量输运 (k, omega)
+    // RANS: 混合了 upwind -> WMLES: limitedLinear 1
+    // 原理：虽然 k 和 omega 是模化的，但 IDDES 依赖它们来判断哪里是 RANS 哪里是 LES。
+    // 使用 upwind 会导致湍流变量传递太慢或太模糊，影响 IDDES 的“屏蔽函数”触发。
+    // limitedLinear 1 保证了二阶精度且无振荡（有界）。
+    div(phi,k)      bounded Gauss limitedLinear 1;
+    div(phi,epsilon) bounded Gauss limitedLinear 1;
+    div(phi,omega)  bounded Gauss limitedLinear 1;
+    
+    // 注意：你原来的文件里有针对 rho*k 的特定设置，建议统一改为 limitedLinear
+    // 如果必须显式写出 rho 项：
+    div((phi*interpolate(rho)),k)      bounded Gauss limitedLinear 1;    
+    div((phi*interpolate(rho)),omega)  bounded Gauss limitedLinear 1;
+    
+    // 粘性耗散项 (保持线性)
+    div(((rho*nuEff)*dev2(T(grad(U))))) Gauss linear;
+}
+
+laplacianSchemes
+{
+    // [修改点5] 扩散项
+    // 保持 Gauss linear corrected (二阶精度)
+    // 除非网格正交性极差 (non-orthogonality > 70)，否则不要改为 limited corrected
+    // LES 对数值耗散很敏感，corrected 是最准确的。
+    default         Gauss linear corrected;
+    laplacian(nuEff,U) Gauss linear corrected;
+    laplacian((1|A(U)),p_rgh) Gauss linear corrected;
+}
+
+interpolationSchemes
+{
+    default         linear;
+    interpolate(U)  linear;
+    interpolate(alpha) linear;
+}
+
+snGradSchemes
+{
+    // 面法向梯度
+    // 同样保持 corrected 以获得最高精度
+    default         corrected;
+    snGrad(p_rgh)   corrected;
+    snGrad(p)       corrected;
+}
+
+wallDist
+{
+    method          meshWave;
+}
+
+fluxRequired
+{
+    default         no;
+    p_rgh           ;
+    p               ;
+}
+
+// ************************************************************************* //

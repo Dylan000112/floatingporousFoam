@@ -1,0 +1,24 @@
+#!/bin/bash
+
+# 处理文件，提取完整的时间-COR对
+awk '
+/Time = / {
+    time = $NF
+}
+/Centre of rotation:/ {
+    if (time != "") {
+        # 提取完整的旋转中心坐标（包括x,y,z）
+        # $NF是最后一个字段，但我们需要完整的坐标部分
+        # 从"Centre of rotation: "之后开始的所有内容
+        line = $0
+        # 找到冒号的位置，然后提取后面的所有内容
+        split(line, parts, ": ")
+        if (length(parts) >= 2) {
+            cor = parts[2]
+            # 去掉可能的空格和括号
+            gsub(/^[ \t\(]+|[ \t\)]+$/, "", cor)
+            print time, cor
+            time = ""  # 重置时间变量
+        }
+    }
+}' log.olaDyMFlow > Extract_Time_COR.txt

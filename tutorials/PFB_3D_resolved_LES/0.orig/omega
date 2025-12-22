@@ -1,0 +1,46 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  v2206                                 |
+|   \\  /    A nd           | Website:  www.openfoam.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       volScalarField;
+    object      omega;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+dimensions      [0 0 -1 0 0 0 0];
+
+internalField   uniform 5.0; // 建议设为 5.0，保证 nu_t/nu = 2 (非常干净的流场)
+
+boundaryField
+{
+
+    "(outlet|inlet|atmosphere)"
+    {
+        type            inletOutlet;
+        inletValue      uniform 5.0;
+        value           uniform 5.0;
+    }
+
+    "(stationaryWalls|floater|BB1|BB2|BB3|BB4|BB5|BB6|BB7|BB8|BB9)"
+    {
+        type            omegaWallFunction;
+        value           uniform 5.0;
+    }
+    
+    "(front|back)"
+    {
+    	type            omegaWallFunction;
+        value           uniform 5.0;
+        //type            cyclicAMI;
+    }
+}
+
+
+// ************************************************************************* //

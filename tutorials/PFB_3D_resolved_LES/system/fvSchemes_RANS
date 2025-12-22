@@ -1,0 +1,89 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  5                                     |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      fvSchemes;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+ddtSchemes
+{
+    default         Euler;  // 改为 Euler 提高稳定性，或 CrankNicolson 0.9;
+}
+
+gradSchemes
+{
+    default         Gauss linear;
+    grad(p)         Gauss linear;
+    grad(p_rgh)     Gauss linear;
+    grad(U)         Gauss linear;
+}
+
+divSchemes
+{
+    default         none;
+    
+    // 速度对流项 - 使用更稳定的格式
+    div(rhoPhi,U)   Gauss limitedLinearV 1;  // 限制性线性格式
+    div((rhoPhi|interpolate(porosity)),U)  Gauss limitedLinearV 1;
+    
+    // VOF 方程 - 使用界面压缩格式
+    div(phi,alpha)  Gauss interfaceCompression;
+    div(phirb,alpha) Gauss interfaceCompression;
+    
+    // 湍流方程 - 使用有界格式
+    div(phi,k)      bounded Gauss limitedLinear 1;
+    div(phi,epsilon) bounded Gauss limitedLinear 1;
+    div(phi,omega)  bounded Gauss limitedLinear 1;
+    
+    div((phi*interpolate(rho)),k)      Gauss upwind;    
+    div((phi*interpolate(rho)),omega) Gauss upwind;
+    
+    // 粘性耗散项
+    div(((rho*nuEff)*dev2(T(grad(U))))) Gauss linear;
+}
+
+laplacianSchemes
+{
+    default         Gauss linear corrected;
+    laplacian(nuEff,U) Gauss linear corrected;
+    laplacian((1|A(U)),p_rgh) Gauss linear corrected;
+}
+
+interpolationSchemes
+{
+    default         linear;
+    interpolate(U)  linear;
+    interpolate(alpha) linear;
+}
+
+snGradSchemes
+{
+    default         corrected;
+    snGrad(p_rgh)   corrected;
+    snGrad(p)       corrected;
+}
+
+wallDist
+{
+    method          meshWave;
+}
+
+// 添加通量计算方案
+fluxRequired
+{
+    default         no;
+    p_rgh           ;
+    p               ;
+}
+
+// ************************************************************************* //

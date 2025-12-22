@@ -1,0 +1,39 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  v2206                                 |
+|   \\  /    A nd           | Website:  www.openfoam.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      changeDictionaryDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+boundary
+{
+    back
+    {
+        type            cyclicAMI;
+        neighbourPatch  front;
+        transform       noOrdering;
+        
+        matchTolerance  0.001;      // 允许 1mm 的匹配误差 (根据你的尺度调整)
+        lowWeightCorrection 0.2;    // 允许权重低于0.2的面存在（防止崩在边缘面）
+    }
+    front
+    {
+        type            cyclicAMI;
+        neighbourPatch  back;
+        transform       noOrdering;
+        
+        matchTolerance  0.001;      // 允许 1mm 的匹配误差 (根据你的尺度调整)
+        lowWeightCorrection 0.2;    // 允许权重低于0.2的面存在（防止崩在边缘面）
+    }
+}
+
+// ************************************************************************* //

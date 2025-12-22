@@ -1,0 +1,4 @@
+#!/bin/bash
+
+export FILE="PFB_o.stl"
+surfaceTransformPoints -scale "(0.01 0.01 0.01)" $FILE PFB_1.stl

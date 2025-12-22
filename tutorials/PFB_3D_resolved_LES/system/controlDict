@@ -1,0 +1,114 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  5                                     |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      controlDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+libs ();
+
+application     olaFlow;
+
+startFrom       latestTime;
+
+startTime       0;
+
+stopAt          endTime;
+
+endTime         20;
+
+deltaT          0.00001;
+
+writeControl    adjustableRunTime;
+
+writeInterval   0.02;
+
+purgeWrite      60;
+
+writeFormat     ascii;
+
+writePrecision  12;
+
+compression     off;
+
+timeFormat      general;
+
+timePrecision   6;
+
+runTimeModifiable yes;
+
+adjustTimeStep  yes;
+
+maxCo           0.5;
+maxAlphaCo      0.5;
+maxDeltaT       0.05;
+
+
+functions
+{
+
+	//#includeFunc  sampleDict
+       #include "force1"
+       #include "force2"
+       #include "force3"
+       #include "force4"
+       #include "force5"
+       #include "force6"
+       #include "force7"
+       #include "force8"
+       #includeFunc waveGauges
+       
+    // 统计平均场
+    fieldAverage1
+    {
+        type            fieldAverage;
+        libs            ("libfieldFunctionObjects.so");
+        writeControl    writeTime;
+        
+        // 什么时候开始统计？
+        // 建议：等波浪流过结构物并建立稳定尾流后再开始（例如第5秒或第3个周期后）
+        timeStart       0.0; 
+        
+        fields
+        (
+            U
+            {
+                mean        on;  // 输出 UMean (平均速度)
+                prime2Mean  on;  // 输出 UPrime2Mean (雷诺应力/脉动强度)
+                base        time;
+            }
+            p_rgh
+            {
+                mean        on;
+                prime2Mean  off;
+                base        time;
+            }
+            alpha.water
+            {
+                mean        on;
+                prime2Mean  off;
+                base        time;
+            }
+        );
+    }
+    
+    // 可选：Q判据 (用来画涡结构的)
+    Q
+    {
+        type            Q;
+        libs            ("libfieldFunctionObjects.so");
+        writeControl    writeTime;
+        // 这是一个标量场，等值面设为正值可以看到涡管
+    }
+}
+// ************************************************************************* //
