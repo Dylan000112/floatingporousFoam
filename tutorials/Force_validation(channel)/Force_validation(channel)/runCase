@@ -1,0 +1,26 @@
+#!/bin/bash
+
+./cleanCase
+
+mkdir 0
+
+echo blockMesh meshing...
+blockMesh 
+
+echo Creating floating object...
+topoSet 
+
+
+echo Preparing 0 folder...
+rm -fr 0
+cp -r 0.org 0
+
+echo Setting the fields...
+setFields 
+
+
+porousolaDyMFlow > log.olaDyMFlow
+
+
+
+echo Simulation complete.
