@@ -175,8 +175,8 @@ void Foam::functionObjects::porousforces::calcForcesMoments()
             const vector UR = U[celli] - (Linear_vel_ + (Angular_vel_ ^ Md));
             URField[celli] = UR;
 
-            vector fA = alpha[celli] * aPorField[celli] * sqr(1.0-poro)/pow3(poro) * mu[celli] / sqr(D50Field[celli]) * UR * V;
-            vector fB = alpha[celli] * (bPorField[celli] * (1.0 + 7.5/KCPorField[celli]) * (1.0-poro)/pow3(poro) * rhoCell[celli] / D50Field[celli] * V) * UR * mag(UR);
+            vector fA = alpha[celli] * aPorField[celli] * sqr(1.0-poro)/sqr(poro) * mu[celli] / sqr(D50Field[celli]) * UR * V;
+            vector fB = alpha[celli] * (bPorField[celli] * (1.0 + 7.5/KCPorField[celli]) * (1.0-poro)/sqr(poro) * rhoCell[celli] / D50Field[celli] * V) * UR * mag(UR);
             vector fC = alpha[celli] * cPorField[celli] * acc[celli] * V / poro * rhoCell[celli];
 
             const vector cellDrag = fA + fB + fC;
@@ -214,6 +214,15 @@ void Foam::functionObjects::porousforces::calcForcesMoments()
     reduce(sumPressureForce_, sumOp<vector>());
     reduce(sumGravityForce_, sumOp<vector>());
     reduce(sumTotalMoment_, sumOp<vector>());
+    
+    Info<< "PorousForces [" << name() << "] output:" << nl
+        << "    Drag     : " << sumDragForce_ << nl
+        << "    DragA     : " << sumDragForceA_ << nl
+        << "    DragB     : " << sumDragForceB_ << nl
+        << "    DragC     : " << sumDragForceC_ << nl
+        << "    Pressure : " << sumPressureForce_ << nl
+        << "    Gravity  : " << sumGravityForce_ << nl
+        << "    Moment   : " << sumTotalMoment_ << endl;
 }
 
 Foam::vector Foam::functionObjects::porousforces::forceEff() const
@@ -225,6 +234,8 @@ Foam::vector Foam::functionObjects::porousforces::momentEff() const
 bool Foam::functionObjects::porousforces::execute()
 {
     calcForcesMoments();
+    
+    
     const auto& coordSys = *coordSysPtr_;
     setResult("dragForce",     coordSys.localVector(sumDragForce_));
     setResult("pressureForce", coordSys.localVector(sumPressureForce_));
@@ -279,4 +290,3 @@ void Foam::functionObjects::porousforces::writeHeader(OFstream& os, const word& 
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
