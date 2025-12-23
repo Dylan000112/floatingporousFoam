@@ -1,0 +1,49 @@
+#!/bin/bash
+
+# 最终待删除目录列表
+all_to_delete=()
+
+# 遍历所有 processor* 文件夹（排除 processor0）
+for dir in processor*/; do
+    [[ "$dir" == "processor0/" ]] && continue
+
+	echo "Loading... $dir"
+
+    cd "$dir" || continue
+
+    # 当前文件夹中待删除目录列表
+    local_to_delete=()
+
+    for subdir in */; do
+        name="${subdir%/}"
+        if [[ "$name" =~ ^[0-9]+([.][0-9]+)?$ ]]; then
+            result=$(echo "$name < 17" | bc)
+            if [[ "$result" -eq 1 ]]; then
+                local_to_delete+=("$dir$name")
+            fi
+        fi
+    done
+
+    # 合并到总待删除列表中
+    all_to_delete+=("${local_to_delete[@]}")
+
+    cd ..
+done
+
+# 一次性询问是否删除所有收集到的目录
+if [[ ${#all_to_delete[@]} -gt 0 ]]; then
+    echo "将删除以下目录（文件夹名为数字且小于300，来自非processor0目录）："
+    printf '%s\n' "${all_to_delete[@]}"
+    read -p "是否确认删除这些目录？[y/n]: " answer
+    if [[ "$answer" == [Yy] ]]; then
+        for folder in "${all_to_delete[@]}"; do
+            rm -rf "$folder"
+            echo "已删除 $folder"
+        done
+    else
+        echo "取消删除操作"
+    fi
+else
+    echo "未找到任何符合条件的目录"
+fi
+

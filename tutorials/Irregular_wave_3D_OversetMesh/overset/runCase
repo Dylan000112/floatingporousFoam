@@ -1,0 +1,7 @@
+#!/bin/bash
+
+
+echo Overset blockMesh meshing...
+
+blockMesh 
+

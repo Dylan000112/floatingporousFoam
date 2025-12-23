@@ -1,0 +1,25 @@
+#!/bin/bash
+
+./cleanCase
+
+mkdir 0
+
+echo blockMesh meshing...
+blockMesh > log.blockMesh
+
+
+echo Merge meshing...
+mergeMeshes . ../overset -overwrite > log.mergeMeshes
+
+echo Creating floating object...
+topoSet > log.topoSet
+
+
+echo Preparing 0 folder...
+rm -fr 0
+cp -r 0.org 0
+
+echo Setting the fields...
+setFields > log.setFields
+
+

@@ -1,0 +1,16 @@
+#!/bin/bash
+
+
+rm -rf processor*
+rm log.decomposePar log.olaDyMFlow
+
+echo decompose...
+decomposePar > log.decomposePar
+
+echo Running...
+mpirun -np 100 porousolaDyMFlow -parallel > log.olaDyMFlow
+
+echo reconstruct...
+reconstructPar
+
+echo Simulation complete.

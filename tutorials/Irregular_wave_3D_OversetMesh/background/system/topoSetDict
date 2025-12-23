@@ -1,0 +1,139 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  v2206                                 |
+|   \\  /    A nd           | Web:      www.OpenFOAM.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      topoSetDict;
+}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+actions
+(
+    // =========================================================
+    // 步骤 1-2: 区分背景网格和前景网格
+    // =========================================================
+
+    // 1. 识别并提取背景网格
+    {
+        name    backgroundCells;
+        type    cellSet;
+        action  new;
+        source  regionToCell;
+        sourceInfo
+        {
+            insidePoints ((-3 0 0.5)); // 确保该点在背景网格内
+        }
+    }
+
+    // 2. 识别并提取重叠网格全集 (Overset Cells)
+    // 这是整个前景网格，后续动网格要基于这个集合来移动
+    {
+        name    oversetCells;
+        type    cellSet;
+        action  new;
+        source  cellToCell;
+        sourceInfo
+        {
+            set backgroundCells;
+        }
+    }
+    {
+        name    oversetCells;
+        type    cellSet;
+        action  invert;
+    }
+
+    // =========================================================
+    // 步骤 3-5: 定义多孔介质区域 (用于 porousModels)
+    // =========================================================
+
+    // 3. 选取几何范围内的多孔介质候选单元
+    {
+        name    porousCells;
+        type    cellSet;
+        action  new;
+        source  boxToCell;
+        sourceInfo { box (-0.24 -3 0.46) (-0.15  3  0.64); }
+    }
+    {
+        name    porousCells;
+        type    cellSet;
+        action  add;
+        source  boxToCell;
+        sourceInfo { box (-0.15 -3 0.55) ( 0.15  3  0.64); }
+    }
+    {
+        name    porousCells;
+        type    cellSet;
+        action  add;
+        source  boxToCell;
+        sourceInfo { box ( 0.15 -3 0.46) (0.24  3  0.64); }
+    }
+
+    // 4. 约束多孔介质：仅保留属于 oversetCells 的部分
+    // 防止框选到背景网格
+    {
+        name    porousCells;
+        type    cellSet;
+        action  subset;
+        source  cellToCell;
+        sourceInfo
+        {
+            set oversetCells;
+        }
+    }
+
+    // 5. 将最终的单元集转换为 CellZone (供 fvOptions/porousParams 使用)
+    {
+        name    porous;
+        type    cellZoneSet;
+        action  new;
+        source  setToCellZone;
+        sourceInfo
+        {
+            set     porousCells;
+        }
+    }
+
+    // =========================================================
+    // 步骤 6-7: [新增] 生成动网格所需的 pointZone
+    // =========================================================
+
+    // 6. 将整个重叠网格 (oversetCells) 转换为点集
+    // 【重要】必须使用 oversetCells 而不是 porousCells。
+    // 这样才能保证整个前景网格作为一个刚体移动，不会发生内部变形。
+    {
+        name    movingPoints;
+        type    pointSet;
+        action  new;
+        source  cellToPoint;
+        sourceInfo
+        {
+            set     oversetCells;
+            option  all;
+        }
+    }
+
+    // 7. 保存为 pointZone，供 sixDoFRigidBodyMotionSolver 读取
+    {
+        name    oversetMoveZone; // <--- 记下这个名字，填入 dynamicMeshDict
+        type    pointZoneSet;
+        action  new;
+        source  setToPointZone;
+        sourceInfo
+        {
+            set     movingPoints;
+        }
+    }
+
+);
+
+// ************************************************************************* //
