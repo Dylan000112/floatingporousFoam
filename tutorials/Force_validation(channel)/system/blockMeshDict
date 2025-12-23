@@ -1,0 +1,197 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  5                                     |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      blockMeshDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+scale 1;
+
+X0    -1;
+X1     -0.5;
+X2     0.5;
+X3     1;
+
+Y0    -0.5;
+Y1     0.5;
+
+Z0     0;
+Z1     0.2;
+Z2     0.4;
+Z3     0.6;
+
+nx1  50;
+nx2  100;
+nx3  50;
+
+ny   1;
+
+nz1  20;
+nz2  20;
+nz3  20;
+
+vertices
+(
+//X-direction-1
+    ($X0 $Y0 $Z0)//0
+    ($X1 $Y0 $Z0)//1
+    ($X1 $Y1 $Z0)//2
+    ($X0 $Y1 $Z0)//3
+    
+    ($X0 $Y0 $Z1)//4
+    ($X1 $Y0 $Z1)
+    ($X1 $Y1 $Z1)
+    ($X0 $Y1 $Z1)//7
+    
+    ($X0 $Y0 $Z2)//8
+    ($X1 $Y0 $Z2)
+    ($X1 $Y1 $Z2)
+    ($X0 $Y1 $Z2)//11
+    
+    ($X0 $Y0 $Z3)//12
+    ($X1 $Y0 $Z3)
+    ($X1 $Y1 $Z3)
+    ($X0 $Y1 $Z3)//15
+    
+//X-direction-2    
+
+    ($X2 $Y0 $Z0)//16
+    ($X2 $Y1 $Z0)
+
+    ($X2 $Y0 $Z1)//18
+    ($X2 $Y1 $Z1)
+
+    ($X2 $Y0 $Z2)//20
+    ($X2 $Y1 $Z2)
+
+    ($X2 $Y0 $Z3)//22
+    ($X2 $Y1 $Z3)
+    
+//X-direction-3    
+    ($X3 $Y0 $Z0)//24
+    ($X3 $Y1 $Z0)
+    
+    ($X3 $Y0 $Z1)//26
+    ($X3 $Y1 $Z1)
+    
+    ($X3 $Y0 $Z2)//28
+    ($X3 $Y1 $Z2)
+    
+    ($X3 $Y0 $Z3)//30
+    ($X3 $Y1 $Z3)
+);
+
+blocks
+(
+//X-direction-1
+    hex (0 1 2 3 4 5 6 7) ($nx1 $ny $nz1) simpleGrading (1 1 0.33)
+    hex (4 5 6 7 8 9 10 11) ($nx1 $ny $nz2) simpleGrading (1 1 1)
+    hex (8 9 10 11 12 13 14 15) ($nx1 $ny $nz3) simpleGrading (1 1 4)
+//X-direction-2    
+    hex (1 16 17 2 5 18 19 6) ($nx2 $ny $nz1) simpleGrading (2 1 0.33)
+    hex (5 18 19 6 9 20 21 10) ($nx2 $ny $nz2) simpleGrading (2 1 1)
+    hex (9 20 21 10 13 22 23 14) ($nx2 $ny $nz3) simpleGrading (2 1 4)
+//X-direction-3    
+    hex (16 24 25 17 18 26 27 19) ($nx3 $ny $nz1) simpleGrading (2 1 0.33)
+    hex (18 26 27 19 20 28 29 21) ($nx3 $ny $nz2) simpleGrading (2 1 1)
+    hex (20 28 29 21 22 30 31 23) ($nx3 $ny $nz3) simpleGrading (2 1 4)
+);
+
+edges
+(
+);
+
+boundary
+(
+    inlet
+    {
+        type patch;
+        faces
+        (
+            (0 4 7 3)
+            (4 8 11 7)
+            (8 12 15 11)
+        );
+    }
+    outlet
+    {
+        type patch;
+        faces
+        (
+            (24 26 27 25)
+            (26 28 29 27)
+            (28 30 31 29)
+        );
+    }
+    stationaryWalls
+    {
+        type wall;
+        faces
+        (
+            (0 3 2 1)
+            (1 2 17 16)
+            (16 17 25 24)
+        );
+    }
+    atmosphere
+    {
+        type patch;
+        faces
+        (
+            (12 13 14 15)
+            (13 22 23 14)
+            (22 30 31 23)
+        );
+    }
+    frontAndback
+    {
+        type empty;
+        faces
+        (
+            (3 7 6 2)
+            (7 11 10 6)
+            (11 15 14 10)
+            
+            (2 6 19 17)
+            (6 10 21 19)
+            (10 14 23 21)
+            
+            (17 19 27 25)
+            (19 21 29 27)
+            (21 23 31 29)
+            
+            
+            (5 9 8 4)
+            (9 13 12 8)
+            (1 5 4 0)
+            
+            (16 18 5 1)
+            (18 20 9 5)
+            (20 22 13 9)
+            
+            (24 26 18 16)
+            (26 28 20 18)
+            (28 30 22 20)
+        );
+    }
+    floatingObject
+    {
+        type wall;
+        faces ();
+    }
+);
+
+mergePatchPairs
+(
+);
+
+// ************************************************************************* //
