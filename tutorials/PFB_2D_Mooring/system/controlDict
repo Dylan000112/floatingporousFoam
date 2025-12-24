@@ -19,7 +19,6 @@ libs
 (
 	poroussixDoFMooring
 	poroussixDoFRigidBodyMotion
-	//"/home/dongyy/OpenFOAM/dongyy-v2206/platforms/linux64GccDPInt32Opt/lib/libporoussixDoFRigidBodyMotion.so"
 );
 
 application     porousolaFlow;

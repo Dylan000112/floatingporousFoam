@@ -1,39 +1,99 @@
 # FloatingporousFoam
 
+A specialized OpenFOAM library for simulating the interaction between waves, currents, and moving porous structures.
+
+<p align="center">
+  <img src="./doc/DeformationMesh_Mooring.png" alt="Moored Floating Porous Structure" width="45%">
+  <img src="./doc/Resolved.png" alt="Fully Resolved Porous Structure" width="45%">
+</p>
+
 ## Description
-[![Image loading](./doc/DeformationMesh_Mooring.png)](https://www.youtube.com/watch?v=D-EE6wJXsYc)
 
-[**FloatingporousFoam**](https://www.youtube.com/watch?v=D-EE6wJXsYc) is a library for simulating porous structure's motion under wave and current in OpenFOAM.
+**FloatingporousFoam** is an open-source solver developed to address the complex hydrodynamics of porous structures in marine environments. It extends the capabilities of standard OpenFOAM solvers to handle:
 
-[![Image loading](./doc/Resolved.png)](https://www.youtube.com/watch?v=YVBLNHlsD24)
+*   **Porous Structure Motion:** Simulation of porous bodies moving under wave and current loads.
+*   **Fully Resolved Models:** High-fidelity simulation of flow through and around porous media.
+*   **Mooring Systems:** Coupling with mooring dynamics (via foamMooring).
 
-[Fully resolved porous structure](https://www.youtube.com/watch?v=YVBLNHlsD24).
+This library is particularly useful for coastal engineering applications, such as floating breakwaters, aquaculture cages, and other permeable marine structures.
 
-## Usage
-Cases have been tested for OpenFOAM v2206 only.
+## Compatibility
 
-Requires `olaFlow`: https://github.com/phicau/olaFlow.
+*   **OpenFOAM Version:** Tested specifically on **OpenFOAM v2206**.
+*   **System:** Linux (Standard OpenFOAM environment).
 
-For the moored-floating porous sturcture case, requires `foamMooring`: https://gitlab.com/hfchen20/foamMooring/-/tree/master/.
+## Dependencies
+
+Before installing, ensure the following libraries are present in your environment:
+
+1.  **olaFlow** (Required for wave generation and absorption)
+    *   Source: [github.com/phicau/olaFlow](https://github.com/phicau/olaFlow)
+2.  **foamMooring** (Required for moored cases only)
+    *   Source: [gitlab.com/hfchen20/foamMooring](https://gitlab.com/hfchen20/foamMooring/-/tree/master/)
 
 ## Installation
-1. Copy the `floatingporousFoam` floder to `$WM_PROJECT_USER_DIR`.
-2. Run `./Allwmake`.
-3. Include the following lines in your `contorlDict`:
-   
-   `libs
-      (
-        poroussixDoFRigidBodyMotion
-      );`
 
-4. Run your case with `porousolaDyMFlow`
+1.  **Download the source code** to your user directory:
+    ```bash
+    cp -r floatingporousFoam $WM_PROJECT_USER_DIR/
+    ```
+
+2.  **Compile the library and solvers**:
+    ```bash
+    cd $WM_PROJECT_USER_DIR/floatingporousFoam
+    ./Allwmake
+    ```
+
+## Usage & Configuration
+
+### 1. ControlDict Setup
+Depending on your simulation type, you must load the appropriate libraries in `system/controlDict`.
+
+*   **For Dynamic Mesh cases (Free floating):**
+    ```cpp
+    libs
+    (
+        "libporoussixDoFRigidBodyMotion.so"
+    );
+    ```
+
+*   **For Overset Mesh cases:**
+    ```cpp
+    libs
+    (
+        "liboversetPadding.so"
+        "libporoussixDoFRigidBodyMotion.so"
+    );
+    ```
+
+### 2. Running the Solver
+Run the simulation using the custom solver:
+```bash
+porousolaDyMFlow
+```
 
 ## Publications
-Yiyong Dong, Weikai Tan, Hao Chen, Jing Yuan; Numerical modeling of wave interaction with a porous floating structure consisting of uniform spheres. Physics of Fluids 1 August 2024; 36 (8): 087133. https://doi.org/10.1063/5.0222161
+
+If you use this code in your research, please cite the following paper:
+
+> **Yiyong Dong, Weikai Tan, Hao Chen, Jing Yuan.** (2024). "Numerical modeling of wave interaction with a porous floating structure consisting of uniform spheres." *Physics of Fluids*, 36(8), 087133. [DOI: 10.1063/5.0222161](https://doi.org/10.1063/5.0222161)
+
+**BibTeX:**
+```bibtex
+@article{Dong2024,
+  author = {Dong, Yiyong and Tan, Weikai and Chen, Hao and Yuan, Jing},
+  title = {Numerical modeling of wave interaction with a porous floating structure consisting of uniform spheres},
+  journal = {Physics of Fluids},
+  volume = {36},
+  number = {8},
+  pages = {087133},
+  year = {2024},
+  doi = {10.1063/5.0222161}
+}
+```
 
 ## Acknowledgements
-**OpenFOAM** is free, open source software for computational fluid dynamics (CFD), developed primarily by CFD Direct, on behalf of the [OpenFOAM](https://openfoam.org/) Foundation. 
 
-**olaFlow** is an open source project developed within the OpenFOAM® framework as a continuation of the work in [Higuera et al.](https://github.com/phicau/olaFlow) for simulating wave and porous structure interactions in the coastal and offshore fields. 
-
-**foamMooring** is a mooring restraints library for rigid body motions in OpenFOAM®, developed by [Haifei Chen](https://gitlab.com/hfchen20/foamMooring/-/tree/master/).
+*   **[OpenFOAM](https://openfoam.org/)**: The open source CFD toolbox.
+*   **[olaFlow](https://github.com/phicau/olaFlow)**: Developed by Higuera et al. for simulating wave and porous structure interactions.
+*   **[foamMooring](https://gitlab.com/hfchen20/foamMooring/-/tree/master/)**: Developed by Haifei Chen for mooring restraints in OpenFOAM.

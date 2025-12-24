@@ -6,4 +6,4 @@ echo "Overset..."
 
 
 echo "Background..."
-(cd background && ./runCase)
+(cd background && ./preRun && ./runCase)
