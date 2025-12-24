@@ -36,7 +36,6 @@ This library is particularly useful for **coastal engineering applications**, su
 *   Porous membranes
 
 ## ✨ Features
-## ✨ Features
 *   **Porous Structure Motion**: Simulation of porous bodies moving under wave and current loads.
 *   **Versatile Mesh Support**: Seamlessly supports both **Dynamic Mesh** and **Overset Mesh** techniques for handling complex motions.
 *   **Mooring Systems**: Coupling with mooring dynamics (via `foamMooring`).
