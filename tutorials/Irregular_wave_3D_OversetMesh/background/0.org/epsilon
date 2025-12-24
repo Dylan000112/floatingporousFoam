@@ -11,50 +11,36 @@ FoamFile
     format      ascii;
     class       volScalarField;
     location    "0";
-    object      nut;
+    object      epsilon;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-dimensions      [0 2 -1 0 0 0 0];
+dimensions      [0 2 -3 0 0 0 0];
 
-internalField   uniform 0;
+internalField   uniform 0.0001;
 
 boundaryField
 {
-    inlet
+    "(inlet|outlet|atmosphere|front|back)"
     {
-        type            calculated;
-        value           uniform 0;
+        type            inletOutlet;
+        inletValue      uniform 0.0001;
+        value           uniform 0.0001;
     }
-    outlet
+
+    "(stationaryWalls|floatingObject)"
     {
-        type            calculated;
-        value           uniform 0;
-    }
-    stationaryWalls
-    {
-        type            nutkWallFunction;
+        type            epsilonWallFunction;
         Cmu             0.09;
         kappa           0.41;
         E               9.8;
-        value           uniform 0;
+        value           uniform 0.0001;
     }
-    atmosphere
+
+    "(oversetPatch)"
     {
-        type            calculated;
-        value           uniform 0;
-    }
-    floatingObject
-    {
-        type            nutkWallFunction;
-        Cmu             0.09;
-        kappa           0.41;
-        E               9.8;
-        value           uniform 0;
-    }
-        frontAndback
-    {
-        type            empty;
+         patchType       overset;
+         type            overset;
     }
 }
 

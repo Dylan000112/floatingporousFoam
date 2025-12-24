@@ -17,48 +17,31 @@ FoamFile
 
 dimensions      [0 2 -3 0 0 0 0];
 
-internalField   uniform 0.1;
+internalField   uniform 0.0001;
 
 boundaryField
 {
-    inlet
+    "(inlet|outlet|atmosphere)"
     {
         type            inletOutlet;
-        inletValue      uniform 0.1;
-        value           uniform 0.1;
+        inletValue      uniform 0.0001;
+        value           uniform 0.0001;
     }
-    outlet
-    {
-        type            inletOutlet;
-        inletValue      uniform 0.1;
-        value           uniform 0.1;
-    }
-    stationaryWalls
+
+    "(stationaryWalls|floatingObject)"
     {
         type            epsilonWallFunction;
         Cmu             0.09;
         kappa           0.41;
         E               9.8;
-        value           uniform 0.1;
+        value           uniform 0.0001;
     }
-    atmosphere
-    {
-        type            inletOutlet;
-        inletValue      uniform 0.1;
-        value           uniform 0.1;
-    }
-    floatingObject
-    {
-        type            epsilonWallFunction;
-        Cmu             0.09;
-        kappa           0.41;
-        E               9.8;
-        value           uniform 0.1;
-    }
+
     frontAndback
     {
         type            empty;
     }
+
     "(oversetPatch)"
     {
          patchType       overset;

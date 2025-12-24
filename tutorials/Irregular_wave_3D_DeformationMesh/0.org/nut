@@ -21,7 +21,7 @@ internalField   uniform 0;
 
 boundaryField
 {
-    "(inlet|outlet|atmosphere)"
+    "(inlet|outlet|atmosphere|front|back)"
     {
         type            calculated;
         value           uniform 0;
@@ -36,10 +36,6 @@ boundaryField
         value           uniform 0;
     }
 
-    frontAndback
-    {
-        type            empty;
-    }
 }
 
 

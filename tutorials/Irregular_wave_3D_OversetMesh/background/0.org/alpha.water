@@ -57,7 +57,8 @@ boundaryField
     {
         type            zeroGradient;
     }
-        "(oversetPatch)"
+
+    "(oversetPatch)"
     {
          patchType       overset;
          type            overset;

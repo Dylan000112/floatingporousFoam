@@ -11,29 +11,27 @@ FoamFile
     format      ascii;
     class       volScalarField;
     location    "0";
-    object      nut;
+    object      omega;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-dimensions      [0 2 -1 0 0 0 0];
+dimensions      [0 0 -1 0 0 0 0];
 
-internalField   uniform 0;
+internalField   uniform 100;
 
 boundaryField
 {
     "(inlet|outlet|atmosphere)"
     {
-        type            calculated;
-        value           uniform 0;
+        type            inletOutlet;
+        inletValue      uniform 100;
+        value           uniform 100;
     }
 
     "(stationaryWalls|floatingObject)"
     {
-        type            nutkWallFunction;
-        Cmu             0.09;
-        kappa           0.41;
-        E               9.8;
-        value           uniform 0;
+        type            omegaWallFunction;
+        value           uniform 100;
     }
 
     frontAndback
@@ -41,6 +39,5 @@ boundaryField
         type            empty;
     }
 }
-
 
 // ************************************************************************* //

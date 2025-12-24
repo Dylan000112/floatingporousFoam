@@ -17,7 +17,6 @@ FoamFile
 motionSolverLibs
 (
 	poroussixDoFRigidBodyMotion
-	//"/home/dongyy/OpenFOAM/dongyy-v2206/platforms/linux64GccDPInt32Opt/lib/libporoussixDoFRigidBodyMotion.so"
 );
 
 dynamicFvMesh       dynamicMotionSolverFvMesh;
@@ -30,6 +29,8 @@ sixDoFRigidBodyMotionCoeffs
    
     innerDistance   1.732;
     outerDistance   5;
+
+    cramp 0;
        
     //Rigidbody
         patches         (floatingObject);

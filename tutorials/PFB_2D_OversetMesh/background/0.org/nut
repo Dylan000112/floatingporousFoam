@@ -21,17 +21,13 @@ internalField   uniform 0;
 
 boundaryField
 {
-    inlet
+    "(inlet|outlet|atmosphere)"
     {
         type            calculated;
         value           uniform 0;
     }
-    outlet
-    {
-        type            calculated;
-        value           uniform 0;
-    }
-    stationaryWalls
+
+    "(stationaryWalls|floatingObject)"
     {
         type            nutkWallFunction;
         Cmu             0.09;
@@ -39,23 +35,12 @@ boundaryField
         E               9.8;
         value           uniform 0;
     }
-    atmosphere
-    {
-        type            calculated;
-        value           uniform 0;
-    }
-    floatingObject
-    {
-        type            nutkWallFunction;
-        Cmu             0.09;
-        kappa           0.41;
-        E               9.8;
-        value           uniform 0;
-    }
-        frontAndback
+
+    frontAndback
     {
         type            empty;
     }
+
     "(oversetPatch)"
     {
          patchType       overset;
