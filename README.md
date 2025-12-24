@@ -49,7 +49,7 @@ Before installing, ensure the following libraries are present in your environmen
 ### 1. ControlDict Setup
 Depending on your simulation type, you must load the appropriate libraries in `system/controlDict`.
 
-*   **For Dynamic Mesh cases (Free floating):**
+*   **For Dynamic Mesh cases:**
     ```cpp
     libs
     (
