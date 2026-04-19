@@ -13,6 +13,40 @@
 </p>
 
 ---
+## ✨ Features
+
+<table align="center">
+  <tr>
+    <td align="center">
+      <img src="./doc/Fig/WC.png" alt="Wave-current coupling"><br>
+      <b>Wave-current coupling</b>
+    </td>
+    <td align="center">
+      <img src="./doc/Fig/Porous.png" alt="Porous media dynamics"><br>
+      <b>Porous media dynamics</b>
+    </td>
+    <td align="center">
+      <img src="./doc/Fig/6DoF.png" alt="Rigid body 6DoF"><br>
+      <b>Rigid body 6DoF</b>
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <img src="./doc/Fig/MPI.png" alt="High performance"><br>
+      <b>High performance</b>
+    </td>
+    <td align="center">
+      <img src="./doc/Fig/Mooring.png" alt="Mooring system"><br>
+      <b>Mooring system</b>
+    </td>
+    <td align="center">
+      <img src="./doc/Fig/Overset.png" alt="Dynamic/overset mesh"><br>
+      <b>Dynamic/overset mesh</b>
+    </td>
+  </tr>
+</table>
+
+---
 
 ## 📋 Table of Contents
 - [Description](#-description)
