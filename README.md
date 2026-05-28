@@ -156,12 +156,17 @@ porousolaDyMFlow
 
 ## 📚 Publications
 
-If you use this code in your research, please cite the following paper:
+If you use this code in your research, please cite the following papers:
 
 > **Yiyong Dong, Weikai Tan, Hao Chen, Jing Yuan.** (2024).  
 > "Numerical modeling of wave interaction with a porous floating structure consisting of uniform spheres."  
 > *Physics of Fluids*, 36(8), 087133.  
 > [DOI: 10.1063/5.0222161](https://doi.org/10.1063/5.0222161)
+>
+> **Yiyong Dong, Jingfeng Dai, Yingwang Pan, Jing Yuan** (2026)
+>  "Wave attenuation mechanism and geometry optimization of a π-shaped porous floating breakwater: A numerical study."
+> *Physics of Fluids*, 38 (5), 055140.
+> [DOI: 10.1063/5.0324644](https://doi.org/10.1063/5.0324644)
 
 **BibTeX:**
 ```bibtex
