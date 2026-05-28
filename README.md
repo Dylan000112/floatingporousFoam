@@ -1,4 +1,4 @@
-# WavePFBFoam
+# FloatingPorousFoam
 
 ![OpenFOAM Version](https://img.shields.io/badge/OpenFOAM-v2206-blueviolet.svg)
 ![Status](https://img.shields.io/badge/Maintenance-Active-green.svg)
