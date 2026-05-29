@@ -14,6 +14,32 @@
 
 
 
+---
+
+## 📋 Table of Contents
+- [Description](#-description)
+- [Features](#-features)
+- [Prerequisites](#-prerequisites)
+- [Installation](#-installation)
+- [Usage & Configuration](#-usage--configuration)
+- [Publications](#-publications)
+- [Acknowledgements](#-acknowledgements)
+
+---
+
+## 📖 Description
+
+**FloatingporousFoam** is an open-source solver developed to address the complex hydrodynamics of porous structures in marine environments. It extends the capabilities of standard OpenFOAM solvers to handle porous structure motion, high-fidelity flow resolution, and coupling with mooring dynamics.
+
+This library is particularly useful for **coastal engineering applications**, such as:
+*   Floating porous breakwaters
+*   Aquaculture cages
+*   Permeable marine barriers
+*   Porous membranes
+
+---
+
+
 ## ✨ Features
 
 <table align="center">
@@ -51,30 +77,9 @@
 *   **Versatile Mesh Support**: Seamlessly supports both **Dynamic Mesh** and **Overset Mesh** techniques for handling complex motions.
 *   **Mooring Systems**: Coupling with mooring dynamics (via `foamMooring`).
 *   **Fully Resolved Models**: High-fidelity simulation of flow through and around porous media.
----
-
-## 📋 Table of Contents
-- [Description](#-description)
-- [Features](#-features)
-- [Prerequisites](#-prerequisites)
-- [Installation](#-installation)
-- [Usage & Configuration](#-usage--configuration)
-- [Publications](#-publications)
-- [Acknowledgements](#-acknowledgements)
 
 ---
 
-## 📖 Description
-
-**FloatingporousFoam** is an open-source solver developed to address the complex hydrodynamics of porous structures in marine environments. It extends the capabilities of standard OpenFOAM solvers to handle porous structure motion, high-fidelity flow resolution, and coupling with mooring dynamics.
-
-This library is particularly useful for **coastal engineering applications**, such as:
-*   Floating porous breakwaters
-*   Aquaculture cages
-*   Permeable marine barriers
-*   Porous membranes
-
----
 
 ## 🛠 Prerequisites
 
