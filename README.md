@@ -9,7 +9,7 @@
 </p>
 
 <p align="center">
-  <b>A specialized OpenFOAM library for simulating the interaction between waves, currents, and moving porous structures.</b>
+  <b>A specialized OpenFOAM library for simulating the interaction between waves, currents, and floating porous structures.</b>
 </p>
 
 
@@ -47,6 +47,10 @@
   </tr>
 </table>
 
+*   **Porous Structure Motion**: Simulation of porous bodies moving under wave and current loads.
+*   **Versatile Mesh Support**: Seamlessly supports both **Dynamic Mesh** and **Overset Mesh** techniques for handling complex motions.
+*   **Mooring Systems**: Coupling with mooring dynamics (via `foamMooring`).
+*   **Fully Resolved Models**: High-fidelity simulation of flow through and around porous media.
 ---
 
 ## 📋 Table of Contents
@@ -70,11 +74,6 @@ This library is particularly useful for **coastal engineering applications**, su
 *   Permeable marine barriers
 *   Porous membranes
 
-## ✨ Features
-*   **Porous Structure Motion**: Simulation of porous bodies moving under wave and current loads.
-*   **Versatile Mesh Support**: Seamlessly supports both **Dynamic Mesh** and **Overset Mesh** techniques for handling complex motions.
-*   **Mooring Systems**: Coupling with mooring dynamics (via `foamMooring`).
-*   **Fully Resolved Models**: High-fidelity simulation of flow through and around porous media.
 ---
 
 ## 🛠 Prerequisites
@@ -86,9 +85,6 @@ Before installing, ensure the following libraries are present in your environmen
 | **OpenFOAM** | `v2206` | [OpenFOAM.com](https://www.openfoam.com/) | **Strictly tested on v2206**. |
 | **olaFlow** | Latest | [GitHub](https://github.com/phicau/olaFlow) | Required for wave generation/absorption. |
 | **foamMooring**| Master | [GitLab](https://gitlab.com/hfchen20/foamMooring) | Required only for moored cases. |
-
-> [!NOTE]
-> Ensure your environment is running Linux with a standard OpenFOAM setup.
 
 ---
 
@@ -113,7 +109,7 @@ Navigate to the directory and execute the make script.
 cd $WM_PROJECT_USER_DIR/floatingporousFoam
 
 # Clean previous builds (optional)
-wclean
+./Allwclean
 
 # Compile library and solvers
 ./Allwmake
