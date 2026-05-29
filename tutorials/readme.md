@@ -8,7 +8,7 @@ This repository provides OpenFOAM case templates for modeling the hydrodynamic r
 * **`Force_validation`**: Verification case ensuring numerical consistency between macroscopic resistance forces and integrated pressure gradients.
 
 ## 3D Macroscopic Methods
-* **`Irregular_wave_3D_OversetMesh` & `Irregular_wave_3D_DeformationMesh`**: 3D dynamic response simulations of PFBs in multi-directional irregular waves, with overset meshes recommended for large-amplitude motions.
+* **`Irregular_wave_3D_OversetMesh` & `Irregular_wave_3D_DeformationMesh`**: 3D dynamic response simulations of PFBs in multi-directional irregular waves, with oversetmesh recommended for large-amplitude motions.
 * **`WC_EmptyFlume_3D`**: 3D numerical wave tank benchmark for synthesizing and validating multi-directional irregular wave fields.
 
 ## 3D Micro-scale Resolved LES
