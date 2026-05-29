@@ -1,0 +1,3 @@
+#!/bin/bash
+
+surfaceTransformPoints -translate "(0.324 0.003 0.333)" PFB_2.stl PFB.stl

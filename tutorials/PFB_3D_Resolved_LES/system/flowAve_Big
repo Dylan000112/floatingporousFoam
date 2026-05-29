@@ -1,0 +1,66 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  v2206                                 |
+|   \\  /    A nd           | Website:  www.openfoam.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      flowAve_Big;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+functions
+{
+    // ============================================================
+    // [第一部分：自动化输出 U, gradP, ddtU]
+    // ============================================================
+    #codeStream
+    {
+        codeInclude
+        #{
+            #include <string>
+        #};
+
+        code
+        #{
+            os << endl; 
+
+            int nx = 19;
+            int nz = 8;
+
+            for (int j = 1; j <= nz; ++j)
+            {
+                for (int i = 1; i <= nx; ++i)
+                {
+                    // ----------------------------------------
+                    // 1. avgU
+                    // ----------------------------------------
+                    os << "    avgU_x" << i << "_z" << j << endl;
+                    os << "    {" << endl;
+                    os << "        type            volFieldValue;" << endl;
+                    os << "        libs            (\"libfieldFunctionObjects.so\");" << endl;
+                    os << "        log             true;" << endl;
+                    os << "        writeControl    timeStep;" << endl;
+                    os << "        writeInterval   1;" << endl;
+                    os << "        executeControl  timeStep;" << endl; 
+                    os << "        executeInterval 1;" << endl; 
+                    os << "        writeFields     false;" << endl;
+                    os << "        regionType      cellSet;" << endl;
+                    os << "        operation       volAverage;" << endl;
+                    os << "        name            x" << i << "_z" << j << ";" << endl;
+                    os << "        fields          (U);" << endl;
+                    os << "    }" << endl;
+                    os << endl;
+                }
+            }
+        #};
+    };
+}
+
+// ************************************************************************* //

@@ -1,0 +1,61 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  v2206                                 |
+|   \\  /    A nd           | Website:  www.openfoam.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile { version 2.0; format ascii; class dictionary; object topoSetDict; }
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+actions
+#codeStream
+{
+    code
+    #{
+        os << "(" << endl;
+
+        // --- X 方向参数 (19个) ---
+        int nx = 19;
+        double xStart = -0.3395;
+        double xStep = 0.037;
+
+        // --- Z 方向参数 (8个) ---
+        int nz = 8;
+        double zStart = 0.2935;
+        double zStep = 0.037; 
+
+        // --- Y 方向固定参数 ---
+        double yMin = 0.1115;
+        double yMax = 0.1485;
+
+        // --- 双重循环生成 ---
+        for (int j = 1; j <= nz; ++j)
+        {
+            // 计算当前 Z 的范围
+            double curZmin = zStart + (j-1) * zStep;
+            double curZmax = curZmin + zStep;
+
+            for (int i = 1; i <= nx; ++i)
+            {
+                // 计算当前 X 的范围
+                double curXmin = xStart + (i-1) * xStep;
+                double curXmax = curXmin + xStep;
+
+                // 写入 action
+                os  << "    { "
+                    << "name x" << i << "_z" << j << "; "
+                    << "type cellSet; "
+                    << "action new; "
+                    << "source boxToCell; "
+                    << "box (" << curXmin << " " << yMin << " " << curZmin << ") "
+                    <<     "(" << curXmax << " " << yMax << " " << curZmax << "); "
+                    << "}" << endl;
+            }
+        }
+
+        os << ");" << endl;
+    #};
+};
+
+// ************************************************************************* //

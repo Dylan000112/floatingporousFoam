@@ -1,0 +1,137 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  5                                     |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      fvSolution;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+solvers
+{
+    "alpha.water.*"
+    {
+        // VOF 求解器通常保持不变，因为它与湍流模型解耦
+        // 但为了捕捉破碎波浪的细节，建议收紧容差
+        nAlphaCorr      2;
+        nAlphaSubCycles 1;
+        cAlpha          1;
+
+        MULESCorr       yes;
+        nLimiterIter    5; // 原为5，可保持
+        alphaApplyPrevCorr  yes;
+
+        solver          smoothSolver;
+        smoother        symGaussSeidel;
+        tolerance       1e-8;
+        relTol          0;          // [修改] 强制完全收敛，不要相对容差
+    }
+
+    "pcorr.*"
+    {
+        solver          PCG;
+        preconditioner
+        {
+            preconditioner  GAMG;
+            tolerance       1e-6;
+            relTol          0;      // [修改] 修正通量时需要高精度
+            smoother        DICGaussSeidel;
+        }
+        tolerance       1e-6;
+        relTol          0;
+        maxIter         100;
+    }
+
+    p_rgh
+    {
+        solver          GAMG;
+        tolerance       1e-7;       // [修改] 稍微收紧
+        relTol          0.01;       // 中间循环可以使用相对容差加速
+        smoother        DICGaussSeidel;
+        nPreSweeps      0;
+        nPostSweeps     2;
+        maxIter         50;
+    }
+
+    p_rghFinal
+    {
+        solver          PCG;
+        preconditioner
+        {
+            preconditioner  GAMG;
+            tolerance       1e-7;
+            relTol          0;      // [关键修改] 最终步必须 relTol 0
+            nVcycles        2;
+            smoother        DICGaussSeidel;
+            nPreSweeps      2;
+        }
+        tolerance       1e-7;
+        relTol          0;          // [关键修改] 保证每一时间步压力场完全收敛
+        maxIter         50;
+    }
+
+    "(U|k|omega|epsilon)"
+    {
+        solver          smoothSolver; // 或者 PBiCGStab
+        smoother        symGaussSeidel;
+        tolerance       1e-8;
+        relTol          0.1;        // 中间步骤可以松一点
+        nSweeps         1;
+    }
+
+    "(U|k|omega|epsilon)Final"
+    {
+        $U;
+        relTol          0;          // [关键修改] 最终步强制收敛
+    }
+}
+
+PIMPLE
+{
+    momentumPredictor   yes;
+    
+    // [关键修改 1] 循环次数
+    // RANS 通常用 5-10次外循环来在大时间步下强行收敛
+    // WMLES 时间步很小 (Co < 1)，非线性并不强，不需要那么多循环
+    nOuterCorrectors    2;          // 2-3 次足矣，多了浪费时间
+    nCorrectors         2;          // 压力校正次数，保持 2
+    nNonOrthogonalCorrectors 1;     // 根据网格质量调整，通常 0-1
+    
+    correctPhi          yes;
+    moveMeshOuterCorrectors yes;
+    
+    ddtCorrection       true;
+    consistent          yes; 
+    
+    // [关键修改 2] 湍流求解频率
+    // true = 只在最后一次外循环算湍流（快，但可能不稳定）
+    // false = 每次循环都算湍流（慢，但更准确，WMLES推荐 false）
+    turbOnFinalIterOnly false; 
+}
+
+// [关键修改 3] 松弛因子
+// WMLES 严禁使用松弛因子 (必须为 1.0)
+// 任何 < 1 的松弛因子都会导致时间推进不准确，抑制涡的产生
+relaxationFactors
+{
+    fields
+    {
+        p       1.0; 
+        p_rgh   1.0;
+    }
+    equations
+    {
+        U       1.0; 
+        "(k|epsilon|omega)" 1.0; 
+    }
+}
+
+// ************************************************************************* //
