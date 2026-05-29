@@ -155,17 +155,17 @@ porousolaDyMFlow
 ```
 
 ---
-
 ## 📚 Publications
 
-If you use this code in your research, please cite the following papers:
+If you use this code or methodology in your research, please consider citing our work:
 
-> **Yiyong Dong, Weikai Tan, Hao Chen, Jing Yuan.** (2024).  
-> "Numerical modeling of wave interaction with a porous floating structure consisting of uniform spheres."  
-> *Physics of Fluids*, 36(8), 087133.  
-> [DOI: 10.1063/5.0222161](https://doi.org/10.1063/5.0222161)
+* **Dong, Y.**, Tan, W., Chen, H., & Yuan, J. (2024). Numerical modeling of wave interaction with a porous floating structure consisting of uniform spheres. *Physics of Fluids*, 36(8), 087133. [![DOI](https://img.shields.io/badge/DOI-10.1063%2F5.0222161-blue.svg)](https://doi.org/10.1063/5.0222161)
 
-**BibTeX:**
+* **Dong, Y.**, Dai, J., Pan, Y., & Yuan, J. (2026). Wave attenuation mechanism and geometry optimization of a π-shaped porous floating breakwater: A numerical study. *Physics of Fluids*, 38(5), 055140. [![DOI](https://img.shields.io/badge/DOI-10.1063%2F5.0324644-blue.svg)](https://doi.org/10.1063/5.0324644)
+
+
+BibTeX Citation:
+
 ```bibtex
 @article{Dong2024,
   author = {Dong, Yiyong and Tan, Weikai and Chen, Hao and Yuan, Jing},
@@ -177,26 +177,16 @@ If you use this code in your research, please cite the following papers:
   year = {2024},
   doi = {10.1063/5.0222161}
 }
-```
 
-
-> **Yiyong Dong, Jingfeng Dai, Yingwang Pan, Jing Yuan** (2026).  
->  "Wave attenuation mechanism and geometry optimization of a π-shaped porous floating breakwater: A numerical study."  
-> *Physics of Fluids*, 38 (5), 055140.  
-> [DOI: 10.1063/5.0324644](https://doi.org/10.1063/5.0324644)  
-
-
-**BibTeX:**
-```bibtex
 @article{Dong2026,
-    author = {Dong, Yiyong and Dai, Jingfeng and Pan, Yingwang and Yuan, Jing},
-    title = {Wave attenuation mechanism and geometry optimization of a  π-shaped porous floating breakwater: A numerical study},
-    journal = {Physics of Fluids},
-    volume = {38},
-    number = {5},
-    pages = {055140},
-    year = {2026},
-    doi = {10.1063/5.0324644}
+  author = {Dong, Yiyong and Dai, Jingfeng and Pan, Yingwang and Yuan, Jing},
+  title = {Wave attenuation mechanism and geometry optimization of a $\pi$-shaped porous floating breakwater: A numerical study},
+  journal = {Physics of Fluids},
+  volume = {38},
+  number = {5},
+  pages = {055140},
+  year = {2026},
+  doi = {10.1063/5.0324644}
 }
 ```
 ---
