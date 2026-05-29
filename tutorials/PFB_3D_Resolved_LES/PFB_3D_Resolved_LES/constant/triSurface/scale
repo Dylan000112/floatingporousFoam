@@ -1,5 +1,0 @@
-#!/bin/bash
-
-surfaceTransformPoints -scale "(0.01 0.01 0.01)" PFB_o.stl PFB_1.stl
-
-surfaceTransformPoints -rotate-z 90 PFB_1.stl PFB_2.stl
