@@ -1,0 +1,128 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  5                                     |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      fvSolution;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+solvers
+{
+    "alpha.water.*"
+    {
+        nAlphaCorr      2;
+        nAlphaSubCycles 1;
+        cAlpha          1;
+
+        MULESCorr       yes;        // ✅ 启用 MULES 修正
+        nLimiterIter    5;
+        alphaApplyPrevCorr  yes;
+
+        solver          smoothSolver;
+        smoother        symGaussSeidel;
+        tolerance       1e-8;
+        relTol          0.01;       // ✅ 添加适度的相对容差
+    }
+
+    "pcorr.*"
+    {
+        solver          PCG;
+        preconditioner
+        {
+            preconditioner  GAMG;
+            tolerance       1e-5;
+            relTol          0.1;    // ✅ 添加相对容差
+            smoother        DICGaussSeidel;
+            cacheAgglomeration no;
+        }
+        tolerance       1e-05;
+        relTol          0.1;        // ✅ 添加相对容差
+        maxIter         100;
+    }
+
+    p_rgh
+    {
+        solver          GAMG;
+        tolerance       1e-8;
+        relTol          0.05;       // ✅ 降低相对容差
+        smoother        DICGaussSeidel;  // ✅ 使用更稳定的光滑器
+        nPreSweeps      0;
+        nPostSweeps     2;
+        maxIter         50;
+    }
+
+    p_rghFinal
+    {
+        solver          PCG;
+        preconditioner
+        {
+            preconditioner  GAMG;
+            tolerance       1e-8;
+            relTol          0.05;   // ✅ 添加相对容差
+            nVcycles        2;
+            smoother        DICGaussSeidel;
+            nPreSweeps      2;
+        }
+        tolerance       1e-8;
+        relTol          0.05;       // ✅ 添加相对容差
+        maxIter         50;         // ✅ 增加最大迭代
+    }
+
+    "(U|k|epsilon|omega)"
+    {
+        solver          smoothSolver;
+        smoother        symGaussSeidel;  // ✅ 对称高斯赛德尔更稳定
+        tolerance       1e-8;       // ✅ 收紧绝对容差
+        relTol          0.05;       // ✅ 显著降低相对容差
+        nSweeps         2;          // ✅ 增加扫描次数
+    }
+
+    "(U|k|epsilon|omega)Final"
+    {
+        $U;                        // ✅ 引用主求解器设置
+        relTol          0;         // 最终求解使用绝对容差
+    }
+}
+
+PIMPLE
+{
+    momentumPredictor   yes;        // ✅ 启用动量预测（提高稳定性）
+    nOuterCorrectors    5;          // ✅ 增加外循环次数
+    nCorrectors         2;          // ✅ 增加内循环次数（关键！）
+    nNonOrthogonalCorrectors 1;     // ✅ 添加非正交修正
+    
+    correctPhi          yes;
+    moveMeshOuterCorrectors yes;
+    
+    // ✅ 添加稳定性增强设置
+    ddtCorrection       true;
+    consistent         yes;
+    
+    // ✅ 添加湍流校正
+    turbOnFinalIterOnly false;
+}
+
+relaxationFactors
+{
+    fields
+    {
+        p       0.3;               // ✅ 保持当前设置
+        p_rgh   0.3;               // ✅ 明确设置 p_rgh 松弛
+    }
+    equations
+    {
+        U       0.5;               // ✅ 降低速度松弛因子
+        "(k|epsilon|omega)" 0.5;   // ✅ 降低湍流松弛因子
+    }
+}
+
+// ************************************************************************* //
