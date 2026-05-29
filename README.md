@@ -73,11 +73,12 @@ This library is particularly useful for **coastal engineering applications**, su
   </tr>
 </table>
 
-*   **Porous Structure Motion**: Simulation of porous bodies moving under wave and current loads.
-*   **Versatile Mesh Support**: Seamlessly supports both **Dynamic Mesh** and **Overset Mesh** techniques for handling complex motions.
-*   **Mooring Systems**: Coupling with mooring dynamics (via `foamMooring`).
-*   **Fully Resolved Models**: High-fidelity simulation of flow through and around porous media.
-
+* **Porous Structure Motion**: Simulation of 6-DoF porous body kinematics under wave and current loads.
+* **Versatile Mesh Adapters**: Support for **Dynamic Mesh** and **Overset Mesh** topologies to handle large-amplitude body motions.
+* **Mooring System Coupling**: Integration with `foamMooring` for transient dynamic restoring force computation.
+* **MPI Parallel Acceleration**: Distributed computing architecture design for large-scale hydrodynamic mesh simulations.
+* **Internal Flow & Dissipation Mapping**: Resolution of intra-pore velocity fields and quantification of turbulent energy dissipation.
+* **Fully Resolved Models**: Pore-scale simulation of flow through and around explicit porous skeleton geometries.
 ---
 
 
